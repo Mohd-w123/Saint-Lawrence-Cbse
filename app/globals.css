@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+  --mayoor-blue: #0b5699;
+  --mayoor-dark: #003d78;
+  --mayoor-gold: #ffb300;
+  --mayoor-gold-light: #ffcc02;
+  --background: #ffffff;
+  --foreground: #333333;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-poppins);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--mayoor-gold);
+  color: var(--mayoor-dark);
+}
