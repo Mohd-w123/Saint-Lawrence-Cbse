@@ -1,5 +1,6 @@
 import SectionHeading from "@/components/ui/SectionHeading";
 import { visionStages } from "@/data/homepage";
+import { school } from "@/lib/school";
 
 const stageColors = [
   "border-[#ffb300] bg-[#ffb300]/10",
@@ -14,8 +15,8 @@ export default function VisionSection() {
     <section className="bg-white py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <SectionHeading
-          title="Vision of Mayoor School Jaipur"
-          subtitle="Recognised as one of Jaipur's most trusted schools, Mayoor is dedicated to nurturing empathy, integrity, perseverance, and autonomy in every child — shaping young people who are confident, capable, and ready to serve the world with purpose and zeal."
+          title={`Vision of ${school.name}`}
+          subtitle={`Recognised as one of Jaipur's most trusted schools, ${school.shortName} is dedicated to nurturing empathy, integrity, perseverance, and autonomy in every child — shaping young people who are confident, capable, and ready to serve the world with purpose and zeal.`}
         />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">

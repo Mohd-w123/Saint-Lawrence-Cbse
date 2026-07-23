@@ -4,6 +4,7 @@ import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { manifestoPoints } from "@/data/homepage";
 import { images } from "@/lib/images";
+import { school } from "@/lib/school";
 
 type ManifestoProps = {
   onApplyClick: () => void;
@@ -17,14 +18,14 @@ export default function Manifesto({ onApplyClick }: ManifestoProps) {
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
             <Image
               src={images.manifesto}
-              alt="The Mayoor Manifesto"
+              alt={`${school.director.name}, ${school.director.title}`}
               fill
               className="object-cover"
             />
           </div>
           <div>
             <SectionHeading
-              title="The Mayoor Manifesto"
+              title="The Saint Lawrence Manifesto"
               subtitle="Equal Opportunity for Every Learner: We make sure every child, regardless of background or ability, gets the resources, support, and encouragement they need to succeed."
               light
               align="left"

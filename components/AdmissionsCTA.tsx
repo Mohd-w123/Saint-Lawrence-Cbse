@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { images } from "@/lib/images";
+import { school } from "@/lib/school";
 
 type AdmissionsCTAProps = {
   onApplyClick: () => void;
@@ -12,7 +13,7 @@ export default function AdmissionsCTA({ onApplyClick }: AdmissionsCTAProps) {
     <section className="relative overflow-hidden py-16 md:py-20">
       <Image
         src={images.frontGate}
-        alt="Mayoor School Jaipur front gate"
+        alt={`${school.name} campus`}
         fill
         className="object-cover"
       />
@@ -22,9 +23,8 @@ export default function AdmissionsCTA({ onApplyClick }: AdmissionsCTAProps) {
           School Admissions Open for the Session 2026–27
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/90 md:text-lg">
-          Mayoor School Jaipur, in collaboration with Mayo College General
-          Council, Ajmer, is recognised as a leading CBSE school in Jaipur,
-          Rajasthan. Today&apos;s world values citizens who are creative,
+          {school.name} is recognised as a leading CBSE school on Goner Road,
+          Jaipur, Rajasthan. Today&apos;s world values citizens who are creative,
           empathetic, self-motivated, and critical thinkers.
         </p>
         <button

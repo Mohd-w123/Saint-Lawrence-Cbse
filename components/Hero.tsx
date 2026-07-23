@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { images } from "@/lib/images";
+import { school } from "@/lib/school";
 
 type HeroProps = {
   onEnquireClick: () => void;
@@ -12,7 +13,7 @@ export default function Hero({ onEnquireClick }: HeroProps) {
     <section className="relative mt-[104px] min-h-[70vh] overflow-hidden lg:mt-[120px] lg:min-h-[85vh]">
       <Image
         src={images.hero}
-        alt="Mayoor School Jaipur campus"
+        alt={`${school.name} campus`}
         fill
         priority
         className="object-cover"
@@ -21,10 +22,10 @@ export default function Hero({ onEnquireClick }: HeroProps) {
 
       <div className="relative mx-auto flex min-h-[70vh] max-w-7xl flex-col justify-center px-4 py-16 lg:min-h-[85vh] lg:px-8">
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-[#ffb300] md:text-base">
-          Be the Light
+          {school.tagline}
         </p>
         <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
-          Mayoor School Jaipur – One of the Best Schools in Jaipur
+          {school.name} – One of the Best Schools in Jaipur
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/90 md:text-lg">
           Where every child is known by name, nurtured by purpose, and inspired

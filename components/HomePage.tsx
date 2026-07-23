@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AdmissionModal from "@/components/AdmissionModal";
 import AdmissionsCTA from "@/components/AdmissionsCTA";
+import DirectorSection from "@/components/DirectorSection";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -28,6 +29,7 @@ export default function HomePage() {
       <main>
         <Hero onEnquireClick={openModal} />
         <WhyChoose />
+        <DirectorSection />
         <NewsSection />
         <Testimonials />
         <WhyChooseUs />

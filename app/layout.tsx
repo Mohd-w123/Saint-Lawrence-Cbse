@@ -9,13 +9,15 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Top School in Jaipur | Best School in Jaipur 2026 | Mayoor School",
+  title:
+    "Saint Lawrence Public School Jaipur | CBSE School on Goner Road 2026",
   description:
-    "Mayoor School Jaipur – One of the best CBSE schools in Jaipur. Admissions open 2026-27. Holistic education with empathy, integrity, perseverance, and autonomy.",
+    "Saint Lawrence Public School, Jaipur – A trusted CBSE school on Goner Road, Luniyawas. Admissions open 2026-27. Holistic education with empathy, integrity, and excellence.",
   keywords: [
-    "best school in Jaipur",
-    "CBSE school Jaipur",
-    "Mayoor School Jaipur",
+    "Saint Lawrence Public School",
+    "SLPS Jaipur",
+    "CBSE school Goner Road",
+    "school in Luniyawas Jaipur",
     "admissions 2026",
   ],
 };

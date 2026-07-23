@@ -1,6 +1,7 @@
 import Image from "next/image";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { developmentPillars } from "@/data/homepage";
+import { school } from "@/lib/school";
 
 export default function StudentDevelopment() {
   return (
@@ -8,7 +9,7 @@ export default function StudentDevelopment() {
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <SectionHeading
           title="Student Development at a Leading CBSE School in Jaipur"
-          subtitle="At Mayoor, holistic development isn't a buzzword — it's built into every school day. We nurture six dimensions of growth that prepare students not just for exams, but for life."
+          subtitle={`At ${school.shortName}, holistic development isn't a buzzword — it's built into every school day. We nurture six dimensions of growth that prepare students not just for exams, but for life.`}
         />
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">

@@ -1,4 +1,5 @@
 import { images } from "@/lib/images";
+import { school } from "@/lib/school";
 
 export const navLinks = [
   { label: "Home", href: "/" },
@@ -6,10 +7,10 @@ export const navLinks = [
     label: "About Us",
     href: "#",
     children: [
-      "About Mayoor",
+      "About Saint Lawrence",
       "Legacy & Leadership",
       "Management & Board",
-      "Directors' Desk",
+      "Director's Desk",
       "Facilities",
     ],
   },
@@ -27,7 +28,7 @@ export const navLinks = [
   {
     label: "Resources",
     href: "#",
-    children: ["News", "Mayoor Gazette", "Blog", "Gallery", "School App"],
+    children: ["News", "School Gazette", "Blog", "Gallery", "School App"],
   },
   { label: "Mandatory Public Disclosure", href: "/" },
   { label: "Contact Us", href: "#" },
@@ -36,10 +37,10 @@ export const navLinks = [
 export const newsItems = [
   {
     title:
-      'Investiture Ceremony 2026–27 | Mayoor School Jaipur. "Empowering Young Minds Today, Inspiring Tomorrow\'s Leaders."',
+      'Investiture Ceremony 2026–27 | Saint Lawrence Public School. "Empowering Young Minds Today, Inspiring Tomorrow\'s Leaders."',
     date: "18th July'26",
     excerpt:
-      "Mayoor School Jaipur proudly conducted its Investiture Ceremony for the academic session 2026–27, graced by Sh. Himanshu Kuldeep, Additional Superintendent of Police, Anti-Corruption Bureau, Jaipur, as the Chief Guest.",
+      "Saint Lawrence Public School proudly conducted its Investiture Ceremony for the academic session 2026–27, celebrating student leadership and responsibility.",
     image: images.news.investiture,
   },
   {
@@ -47,15 +48,15 @@ export const newsItems = [
       "Inter-House Sports Competitions: Celebrating Talent, Skills & Sportsmanship.",
     date: "8th - 10th July'26",
     excerpt:
-      "The Inter-House Sports Competitions for Grades I to XI were successfully organised in Tennis, Squash, Skating, Badminton, and Table Tennis.",
+      "The Inter-House Sports Competitions for Grades I to XI were successfully organised, fostering teamwork, discipline, and sporting spirit among students.",
     image: images.news.sports,
   },
   {
     title:
-      "Shark Tank Season 2: Celebrating Young Entrepreneurs at Mayoor School Jaipur.",
+      "Shark Tank Season 2: Celebrating Young Entrepreneurs at Saint Lawrence Public School.",
     date: "4th July'26",
     excerpt:
-      "Mayoor School Jaipur successfully organised the Second Season of Shark Tank, celebrating innovation, creativity, and entrepreneurial spirit among students.",
+      "Saint Lawrence Public School successfully organised the Second Season of Shark Tank, celebrating innovation, creativity, and entrepreneurial spirit among students.",
     image: images.news.sharkTank,
   },
   {
@@ -67,18 +68,18 @@ export const newsItems = [
   },
   {
     title:
-      "Mayoor School Jaipur Organizes Star Gazing Camp Before Summer Breaks.",
+      "Saint Lawrence Public School Organizes Star Gazing Camp Before Summer Breaks.",
     date: "13th-14th May'26",
     excerpt:
-      "Mayoor School Jaipur organized an exciting Star Gazing Activity for students from Grades I to XI before the commencement of summer breaks.",
+      "Saint Lawrence Public School organized an exciting Star Gazing Activity for students from Grades I to XI before the commencement of summer breaks.",
     image: images.news.starGazing,
   },
   {
     title:
-      "Mayoor School Jaipur Hosts Fourth Consecutive Inter-School STEM Challenge.",
+      "Saint Lawrence Public School Hosts Inter-School STEM Challenge.",
     date: "12th May'26",
     excerpt:
-      "Mayoor School Jaipur successfully hosted the fourth consecutive season of its much-awaited Inter-School STEM Competition.",
+      "Saint Lawrence Public School successfully hosted its much-awaited Inter-School STEM Competition, showcasing innovation and scientific curiosity.",
     image: images.news.stem,
   },
 ];
@@ -86,14 +87,14 @@ export const newsItems = [
 export const testimonials = [
   {
     quote:
-      "As a doctor and mother, I value Mayoor School Jaipur's nurturing environment. The school combines academic excellence with holistic development, fostering empathy, confidence, and curiosity.",
+      "As a doctor and mother, I value Saint Lawrence Public School's nurturing environment. The school combines academic excellence with holistic development, fostering empathy, confidence, and curiosity.",
     name: "Dr. Anju Sharma",
     role: "Mother of Nyra Sharma (Grade I-Tulip)",
     image: images.testimonials.anju,
   },
   {
     quote:
-      "Mayoor School Jaipur seamlessly combines academic excellence with holistic development. The dedicated teachers provide personal attention, fostering a love for learning beyond textbooks.",
+      "Saint Lawrence Public School seamlessly combines academic excellence with holistic development. The dedicated teachers provide personal attention, fostering a love for learning beyond textbooks.",
     name: "Ms. Aayushi and Mr. Ankit Agarwal",
     role: "Proud parents of Ayansh Agarwal (Grade I-Orchid)",
     image: images.testimonials.agarwal,
@@ -107,7 +108,7 @@ export const testimonials = [
   },
   {
     quote:
-      "Thanks to the incredible support from the Mayoor School team, our son adapted smoothly and confidently. The Himachal trekking trip was a transformative experience for him.",
+      "Thanks to the incredible support from the Saint Lawrence team, our son adapted smoothly and confidently. The school trips and activities have been transformative experiences for him.",
     name: "Ms. Astha & Mr. Himanshu Kapoor",
     role: "Parent of Aadit Kapoor (Grade VII-Orchid)",
     image: images.testimonials.astha,
@@ -124,13 +125,13 @@ export const whyChooseUsCards = [
   {
     title: "We Value Good Characters",
     description:
-      "Character education is woven into daily life at Mayoor — building integrity, empathy, and responsibility alongside academic achievement.",
+      "Character education is woven into daily life at Saint Lawrence — building integrity, empathy, and responsibility alongside academic achievement.",
     image: images.character,
   },
   {
     title: "Your Children are Safe",
     description:
-      "A secure, GPS-tracked campus with trained staff gives parents peace of mind while students explore, learn, and grow with confidence.",
+      "A secure campus with trained staff gives parents peace of mind while students explore, learn, and grow with confidence.",
     image: images.safety,
   },
 ];
@@ -232,42 +233,36 @@ export const manifestoPoints = [
 
 export const faqItems = [
   {
-    question: "Which board is Mayoor School Jaipur affiliated with?",
-    answer:
-      "Mayoor School Jaipur follows the CBSE curriculum. Our learning is structured across five developmental stages — Chetna, Ananda, Kalpana, Jigyasa, and Sadhana — each designed to match a child's natural growth and curiosity.",
+    question: `Which board is ${school.name} affiliated with?`,
+    answer: `${school.name} follows the CBSE curriculum. Our learning is structured across five developmental stages — Chetna, Ananda, Kalpana, Jigyasa, and Sadhana — each designed to match a child's natural growth and curiosity.`,
   },
   {
-    question:
-      "What is the admission process at Mayoor School Jaipur for the 2026–27 session?",
+    question: `What is the admission process at ${school.name} for the 2026–27 session?`,
     answer:
       'Admissions are open for Nursery to Grade IX and Grade XI. Parents can apply through the "Apply Now" form on our website. Once your application is submitted, our admissions team will reach out with the next steps.',
   },
   {
-    question:
-      "From what grade can my child take admission at Mayoor School Jaipur?",
+    question: `From what grade can my child take admission at ${school.name}?`,
     answer:
-      "Mayoor welcomes children from Early Year I (Nursery) all the way through Grade XII, supporting every stage of a child's educational journey under one roof.",
+      "Saint Lawrence welcomes children from Early Year I (Nursery) all the way through Grade XII, supporting every stage of a child's educational journey under one roof.",
   },
   {
-    question: "Does Mayoor offer English-medium education in Jaipur?",
-    answer:
-      "Yes, Mayoor School Jaipur is a fully English-medium school. All subjects are taught in English, building strong communication skills and academic fluency alongside the CBSE curriculum.",
+    question: "Does Saint Lawrence offer English-medium education in Jaipur?",
+    answer: `Yes, ${school.name} is a fully English-medium school. All subjects are taught in English, building strong communication skills and academic fluency alongside the CBSE curriculum.`,
   },
   {
-    question: "What facilities does Mayoor School Jaipur provide?",
+    question: `What facilities does ${school.name} provide?`,
     answer:
-      "Our campus includes modern classrooms, STEM and STEAM labs, sports facilities including shooting and chess, a safe transport system, and spaces designed for arts, culture, and creative expression.",
+      "Our campus includes modern classrooms, STEM and STEAM labs, sports facilities, a safe transport system, and spaces designed for arts, culture, and creative expression.",
   },
   {
-    question:
-      "Where is Mayoor School Jaipur located, and is transport available?",
-    answer:
-      "Mayoor School Jaipur is located at ITS 1, IT Park Road, EPIP, Sitapura, Jaipur – 302022, Rajasthan. Safe, GPS-tracked transport with trained staff is available across key routes in the city.",
+    question: `Where is ${school.name} located, and is transport available?`,
+    answer: `${school.name} is located at ${school.address} Safe, GPS-tracked transport with trained staff is available across key routes in the city.`,
   },
   {
-    question: "What makes Mayoor stand out among CBSE schools in Jaipur?",
+    question: "What makes Saint Lawrence stand out among CBSE schools in Jaipur?",
     answer:
-      "Mayoor combines academic excellence with holistic growth, experienced faculty, modern classrooms, STEAM learning, a safe campus, and values like empathy, integrity, perseverance, and autonomy.",
+      "Saint Lawrence combines academic excellence with holistic growth, experienced faculty, modern classrooms, STEAM learning, a safe campus, and values like empathy, integrity, perseverance, and autonomy.",
   },
   {
     question: "Where can I find the fee structure and apply online?",

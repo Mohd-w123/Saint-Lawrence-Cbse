@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { FaBars, FaChevronDown, FaEnvelope, FaPhone, FaTimes } from "react-icons/fa";
 import { images } from "@/lib/images";
 import { navLinks } from "@/data/homepage";
+import { school } from "@/lib/school";
 
 type HeaderProps = {
   onApplyClick: () => void;
@@ -27,16 +28,19 @@ export default function Header({ onApplyClick }: HeaderProps) {
       <div className="hidden bg-[#003d78] text-sm text-white lg:block">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
           <div className="flex items-center gap-6">
-            <a href="tel:+919588841005" className="flex items-center gap-2 hover:text-[#ffb300]">
+            <a
+              href={`tel:+91${school.phones[0]}`}
+              className="flex items-center gap-2 hover:text-[#ffb300]"
+            >
               <FaPhone className="text-[#ffb300]" />
-              +91 9588841005, 9588841008
+              {school.phoneDisplay}
             </a>
             <a
-              href="mailto:info@mayoorschooljaipur.org"
+              href={`mailto:${school.email}`}
               className="flex items-center gap-2 hover:text-[#ffb300]"
             >
               <FaEnvelope className="text-[#ffb300]" />
-              info@mayoorschooljaipur.org
+              {school.email}
             </a>
           </div>
           <button
@@ -57,7 +61,7 @@ export default function Header({ onApplyClick }: HeaderProps) {
           <Link href="/" className="relative h-12 w-44 md:h-14 md:w-52">
             <Image
               src={images.logo}
-              alt="Mayoor School Jaipur"
+              alt={school.name}
               fill
               className="object-contain object-left"
               priority
