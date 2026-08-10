@@ -18,12 +18,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        try {
-          await connectDB();
-        } catch (e) {
-          console.error("[Auth] DB connection failed:", e);
-          return null;
-        }
+        await connectDB();
 
         const user = await User.findOne({
           email: credentials.email,

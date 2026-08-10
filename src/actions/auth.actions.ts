@@ -12,9 +12,7 @@ export async function loginAction(formData: FormData) {
       redirect: false,
     });
   } catch (error) {
-    console.error("[Login] Error:", error);
     if (error instanceof AuthError) {
-      console.error("[Login] AuthError type:", error.type, "cause:", error.cause);
       if (error.type === "CredentialsSignin" || error.type === "CallbackRouteError") {
         return { error: "Invalid email or password" };
       }
