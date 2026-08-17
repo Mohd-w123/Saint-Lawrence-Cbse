@@ -1,9 +1,15 @@
-import { notFound } from "next/navigation";
-import { pageService } from "@/services/page.service";
+import { requirePermission } from "@/lib/auth/session";
+import { getPageById } from "@/actions/page.actions";
 import { Container } from "@/components/layout/container";
 import { RichTextRenderer } from "@/components/shared/rich-text-renderer";
-import type { Metadata } from "next";
 import { FileDown } from "lucide-react";
+import { notFound } from "next/navigation";
+
+export const metadata = { title: "Page Preview | School CMS" };
+
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
 function getEmbedUrl(url: string) {
   if (!url) return "";
@@ -18,28 +24,23 @@ function getEmbedUrl(url: string) {
   return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
 }
 
-interface Props {
-  params: Promise<{ slug: string }>;
-}
+export default async function AdminPagePreviewPage({ params }: Props) {
+  // Ensure authenticated user can view pages
+  await requirePermission("pages.view");
+  const { id } = await params;
+  const page = await getPageById(id);
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const page = await pageService.findPublishedBySlug(slug);
-  if (!page) return { title: "Not Found" };
-  return {
-    title: page.seoTitle || page.title,
-    description: page.seoDescription || page.description,
-    keywords: page.seoKeywords,
-  };
-}
-
-export default async function DynamicPage({ params }: Props) {
-  const { slug } = await params;
-  const page = await pageService.findPublishedBySlug(slug);
-  if (!page) notFound();
+  if (!page) {
+    notFound();
+  }
 
   return (
-    <main>
+    <main className="w-full min-h-screen bg-background">
+      {/* Notice header for draft states */}
+      <div className="bg-amber-500 text-white py-1.5 text-center text-xs font-semibold tracking-wider uppercase select-none">
+        Previewing Draft Version of page: &ldquo;{page.title}&rdquo;
+      </div>
+
       {page.banner && (
         <div className="relative h-48 md:h-64 bg-primary/10">
           <img src={page.banner} alt={page.title} className="w-full h-full object-cover" />
@@ -51,6 +52,7 @@ export default async function DynamicPage({ params }: Props) {
       <Container className="py-12">
         {!page.banner && <h1 className="text-3xl font-bold mb-6">{page.title}</h1>}
         {page.description && <p className="text-lg text-muted-foreground mb-8">{page.description}</p>}
+        
         {page.blocks.map((block, idx) => (
           <div key={idx} className="my-6">
             {block.type === "rich-text" && typeof block.content.html === "string" && (

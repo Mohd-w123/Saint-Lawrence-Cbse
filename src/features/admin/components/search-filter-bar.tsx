@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useTransition, useState, useEffect } from "react";
+import { useCallback, useTransition, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -36,15 +35,17 @@ export function SearchFilterBar({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const currentSearch = searchParams.get("search") ?? "";
   const currentStatus = searchParams.get("status") ?? "all";
   const [searchValue, setSearchValue] = useState(currentSearch);
+  const [prevSearch, setPrevSearch] = useState(currentSearch);
 
-  useEffect(() => {
+  if (currentSearch !== prevSearch) {
+    setPrevSearch(currentSearch);
     setSearchValue(currentSearch);
-  }, [currentSearch]);
+  }
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {

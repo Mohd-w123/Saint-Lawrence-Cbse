@@ -19,6 +19,7 @@ export function HomepageRenderer({ sections }: HomepageRendererProps) {
 }
 
 function HomepageSection({ section }: { section: HomepageSectionInput }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const content = section.content as Record<string, any>;
 
   switch (section.type) {

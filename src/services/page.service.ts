@@ -2,7 +2,6 @@ import { BaseService } from "@/lib/cms/base-service";
 import { Page } from "@/models/page.model";
 import type { IPage } from "@/models/page.model";
 import { generateSlug, ensureUniqueSlug } from "@/lib/cms/slug";
-import { connectDB } from "@/lib/db";
 
 class PageService extends BaseService<IPage> {
   constructor() {
