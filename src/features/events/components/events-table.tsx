@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MoreHorizontal, Pencil, Send, Archive, Trash2 } from "lucide-react";
 import { publishEvent, unpublishEvent, deleteEvent } from "@/actions/event.actions";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils/format";
 import type { PaginatedResult } from "@/lib/cms";
 
 interface EventsTableProps {
@@ -59,7 +60,7 @@ export function EventsTable({ data }: EventsTableProps) {
                 <TableRow key={item._id}>
                   <TableCell className="font-medium">{item.title}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {new Date(item.eventDate).toLocaleDateString()}
+                    {formatDate(item.eventDate, { day: "numeric", month: "short", year: "numeric" })}
                   </TableCell>
                   <TableCell className="text-muted-foreground">{item.location || "—"}</TableCell>
                   <TableCell><StatusBadge status={item.status} /></TableCell>

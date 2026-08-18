@@ -36,6 +36,7 @@ import {
   deleteAlbum,
 } from "@/actions/gallery.actions";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils/format";
 import type { PaginatedResult } from "@/lib/cms";
 
 interface GalleryTableProps {
@@ -118,7 +119,7 @@ export function GalleryTable({ data }: GalleryTableProps) {
                     <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {new Date(item.createdAt).toLocaleDateString()}
+                    {formatDate(item.createdAt, { day: "numeric", month: "short", year: "numeric" })}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

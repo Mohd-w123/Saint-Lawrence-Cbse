@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MoreHorizontal, Pencil, Send, Archive, Trash2 } from "lucide-react";
 import { publishPage, unpublishPage, deletePage } from "@/actions/page.actions";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils/format";
 import type { PaginatedResult } from "@/lib/cms";
 
 interface PagesTableProps {
@@ -59,7 +60,7 @@ export function PagesTable({ data }: PagesTableProps) {
                   <TableCell className="text-muted-foreground">/{page.slug}</TableCell>
                   <TableCell><StatusBadge status={page.status} /></TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {new Date(page.createdAt).toLocaleDateString()}
+                    {formatDate(page.createdAt, { day: "numeric", month: "short", year: "numeric" })}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Pencil, Trash2, FileText } from "lucide-react";
 import { deleteTC } from "@/actions/tc.actions";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils/format";
 import type { PaginatedResult } from "@/lib/cms";
 
 interface Props { data: PaginatedResult<any>; }
@@ -36,7 +37,7 @@ export function TCTable({ data }: Props) {
                   <TableCell className="font-medium">{item.studentName}</TableCell>
                   <TableCell className="text-muted-foreground">{item.admissionNumber}</TableCell>
                   <TableCell className="text-muted-foreground">{item.class}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{new Date(item.issueDate).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm">{formatDate(item.issueDate, { day: "numeric", month: "short", year: "numeric" })}</TableCell>
                   <TableCell>
                     <Badge variant={item.status === "active" ? "default" : "destructive"}>{item.status}</Badge>
                   </TableCell>

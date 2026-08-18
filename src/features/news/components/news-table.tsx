@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Pencil, Send, Archive, Trash2 } from "lucide-react";
 import { publishNews, unpublishNews, deleteNews } from "@/actions/news.actions";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils/format";
 import type { PaginatedResult } from "@/lib/cms";
 
 interface NewsTableProps {
@@ -68,7 +69,7 @@ export function NewsTable({ data }: NewsTableProps) {
                   <TableCell className="text-muted-foreground">{item.category || "—"}</TableCell>
                   <TableCell><StatusBadge status={item.status} /></TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "—"}
+                    {item.publishedAt ? formatDate(item.publishedAt, { day: "numeric", month: "short", year: "numeric" }) : "—"}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

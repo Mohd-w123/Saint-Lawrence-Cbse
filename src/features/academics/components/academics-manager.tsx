@@ -17,6 +17,7 @@ import { MoreHorizontal, Pencil, Trash2, Plus } from "lucide-react";
 import { createProgram, updateProgram, deleteProgram, createClass, updateClass, deleteClass, createSubject, updateSubject, deleteSubject, createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from "@/actions/academics.actions";
 import { generateSlug } from "@/lib/cms/slug";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils/format";
 import type { PaginatedResult } from "@/lib/cms";
 
 interface AcademicsManagerProps {
@@ -347,7 +348,7 @@ function CalendarTab({ data }: { data: PaginatedResult<any> }) {
                 {data.data.map((item: any) => (
                   <TableRow key={item._id}>
                     <TableCell className="font-medium">{item.title}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{new Date(item.date).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{formatDate(item.date, { day: "numeric", month: "short", year: "numeric" })}</TableCell>
                     <TableCell><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${typeColors[item.type] || typeColors.other}`}>{item.type}</span></TableCell>
                     <TableCell className="text-muted-foreground text-sm">{item.session}</TableCell>
                     <TableCell><StatusBadge status={item.status} /></TableCell>
