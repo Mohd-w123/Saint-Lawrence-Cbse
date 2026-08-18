@@ -1,14 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useTransition } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { StatusBadge } from "@/features/admin/components/status-badge";
+import { MediaPicker } from "@/features/media/components/media-picker";
 import { SECTION_TYPES, type HomepageSectionInput } from "@/lib/validations/homepage";
 import { updateHomepageSections, publishHomepage, unpublishHomepage } from "@/actions/homepage.actions";
-import { Plus, GripVertical, Trash2, Copy, Send, Eye, EyeOff } from "lucide-react";
+import { Plus, GripVertical, Trash2, Copy, Send, Eye, EyeOff, ChevronDown, ChevronUp, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 interface HomepageEditorProps {
@@ -20,21 +24,30 @@ interface HomepageEditorProps {
 
 export function HomepageEditor({ config }: HomepageEditorProps) {
   const [sections, setSections] = useState<HomepageSectionInput[]>(config.sections);
+  const [status, setStatus] = useState(config.status);
   const [isPending, startTransition] = useTransition();
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [confirmPublish, setConfirmPublish] = useState(false);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [activeMediaTarget, setActiveMediaTarget] = useState<{ sectionIndex: number; field: string; subIndex?: number } | null>(null);
 
   const addSection = (type: string) => {
     const label = SECTION_TYPES.find((s) => s.value === type)?.label ?? type;
-    setSections((prev) => [
-      ...prev,
-      { type, title: label, content: {}, isEnabled: true, order: prev.length },
-    ]);
+    const newSec: HomepageSectionInput = {
+      type,
+      title: label,
+      content: getDefaultContentForType(type),
+      isEnabled: true,
+      order: sections.length,
+    };
+    setSections((prev) => [...prev, newSec]);
+    setExpandedIndex(sections.length);
     setShowAddMenu(false);
   };
 
   const removeSection = (index: number) => {
     setSections((prev) => prev.filter((_, i) => i !== index));
+    if (expandedIndex === index) setExpandedIndex(null);
   };
 
   const duplicateSection = (index: number) => {
@@ -65,81 +78,165 @@ export function HomepageEditor({ config }: HomepageEditorProps) {
     });
   };
 
+  const updateSectionField = (index: number, field: "title", value: string) => {
+    setSections((prev) => {
+      const next = [...prev];
+      if (!next[index]) return prev;
+      next[index] = { ...next[index]!, [field]: value };
+      return next;
+    });
+  };
+
+  const updateSectionContent = (index: number, contentField: string, value: any) => {
+    setSections((prev) => {
+      const next = [...prev];
+      const sec = next[index];
+      if (!sec) return prev;
+      const content = { ...(sec.content || {}), [contentField]: value };
+      next[index] = { ...sec, content };
+      return next;
+    });
+  };
+
   const handleSave = () => {
     startTransition(async () => {
       const result = await updateHomepageSections(sections);
       if (result.error) toast.error(result.error);
-      else toast.success("Sections saved");
+      else toast.success("Draft saved successfully");
     });
   };
 
   const handlePublish = () => {
     startTransition(async () => {
-      const result = config.status === "published"
-        ? await unpublishHomepage()
-        : await publishHomepage();
-      if (result.error) toast.error(result.error);
-      else toast.success(result.success);
+      if (status === "published") {
+        const result = await unpublishHomepage();
+        if (result.error) toast.error(result.error);
+        else {
+          toast.success(result.success);
+          setStatus("draft");
+        }
+      } else {
+        const saveRes = await updateHomepageSections(sections);
+        if (saveRes.error) {
+          toast.error(saveRes.error);
+          return;
+        }
+        const result = await publishHomepage();
+        if (result.error) toast.error(result.error);
+        else {
+          toast.success("Homepage saved and published live!");
+          setStatus("published");
+        }
+      }
       setConfirmPublish(false);
     });
   };
 
+  const handleMediaSelect = (url: string) => {
+    if (!activeMediaTarget) return;
+    const { sectionIndex, field, subIndex } = activeMediaTarget;
+    if (subIndex !== undefined) {
+      const sec = sections[sectionIndex];
+      if (sec) {
+        const content = (sec.content || {}) as Record<string, any>;
+        const items = Array.isArray(content.items) ? [...content.items] : [];
+        if (items[subIndex]) {
+          items[subIndex] = { ...items[subIndex], [field]: url };
+          updateSectionContent(sectionIndex, "items", items);
+        }
+      }
+    } else {
+      updateSectionContent(sectionIndex, field, url);
+    }
+    setActiveMediaTarget(null);
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <StatusBadge status={config.status} />
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <StatusBadge status={status} />
+        <span className="text-sm text-muted-foreground">({sections.length} sections)</span>
         <div className="flex-1" />
         <Button variant="outline" onClick={handleSave} disabled={isPending}>
           Save Draft
         </Button>
-        <Button onClick={() => setConfirmPublish(true)} disabled={isPending}>
+        <Button onClick={() => setConfirmPublish(true)} disabled={isPending} className="bg-[#003d78] hover:bg-[#002a54] text-white">
           <Send className="h-4 w-4 mr-2" />
-          {config.status === "published" ? "Unpublish" : "Publish"}
+          {status === "published" ? "Unpublish" : "Save & Publish"}
         </Button>
       </div>
 
-      {sections.map((section, index) => (
-        <Card key={section._id ?? index} className={!section.isEnabled ? "opacity-60" : ""}>
-          <CardHeader className="flex flex-row items-center gap-2 py-3 px-4">
-            <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-            <CardTitle className="text-sm flex-1">
-              {section.title || SECTION_TYPES.find((s) => s.value === section.type)?.label || section.type}
-            </CardTitle>
-            <div className="flex items-center gap-1">
-              <Button size="sm" variant="ghost" onClick={() => moveSection(index, "up")} disabled={index === 0}>
-                ↑
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => moveSection(index, "down")} disabled={index === sections.length - 1}>
-                ↓
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => toggleSection(index)}>
-                {section.isEnabled ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => duplicateSection(index)}>
-                <Copy className="h-3.5 w-3.5" />
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => removeSection(index)}>
-                <Trash2 className="h-3.5 w-3.5 text-destructive" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="py-2 px-4">
-            <p className="text-xs text-muted-foreground">Type: {section.type}</p>
-          </CardContent>
-        </Card>
-      ))}
+      <div className="space-y-3">
+        {sections.map((section, index) => {
+          const isExpanded = expandedIndex === index;
+          return (
+            <Card key={section._id ?? index} className={`transition-all ${!section.isEnabled ? "opacity-60 bg-muted/30" : ""}`}>
+              <CardHeader className="flex flex-row items-center gap-2 py-3 px-4 select-none">
+                <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                <button
+                  type="button"
+                  onClick={() => setExpandedIndex(isExpanded ? null : index)}
+                  className="flex items-center gap-2 flex-1 text-left font-medium text-sm hover:text-primary"
+                >
+                  <span>{section.title || SECTION_TYPES.find((s) => s.value === section.type)?.label || section.type}</span>
+                  <span className="text-xs text-muted-foreground font-normal">({section.type})</span>
+                  {isExpanded ? <ChevronUp className="h-4 w-4 ml-auto" /> : <ChevronDown className="h-4 w-4 ml-auto" />}
+                </button>
 
-      {/* Add Section */}
+                <div className="flex items-center gap-1">
+                  <Button size="sm" variant="ghost" type="button" onClick={() => moveSection(index, "up")} disabled={index === 0}>
+                    ↑
+                  </Button>
+                  <Button size="sm" variant="ghost" type="button" onClick={() => moveSection(index, "down")} disabled={index === sections.length - 1}>
+                    ↓
+                  </Button>
+                  <Button size="sm" variant="ghost" type="button" onClick={() => toggleSection(index)}>
+                    {section.isEnabled ? <Eye className="h-3.5 w-3.5 text-green-600" /> : <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />}
+                  </Button>
+                  <Button size="sm" variant="ghost" type="button" onClick={() => duplicateSection(index)}>
+                    <Copy className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button size="sm" variant="ghost" type="button" onClick={() => removeSection(index)}>
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  </Button>
+                </div>
+              </CardHeader>
+
+              {isExpanded && (
+                <CardContent className="pt-0 pb-4 px-4 space-y-4 border-t">
+                  <div className="pt-3 space-y-2">
+                    <Label className="text-xs font-semibold">Section Heading</Label>
+                    <Input
+                      value={section.title || ""}
+                      onChange={(e) => updateSectionField(index, "title", e.target.value)}
+                      placeholder="Section Title"
+                    />
+                  </div>
+
+                  <SectionContentEditor
+                    section={section}
+                    index={index}
+                    onChange={(field, val) => updateSectionContent(index, field, val)}
+                    onOpenMedia={(field, subIndex) => setActiveMediaTarget({ sectionIndex: index, field, subIndex })}
+                  />
+                </CardContent>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Add Section Menu */}
       <div className="relative">
-        <Button variant="outline" className="w-full border-dashed" onClick={() => setShowAddMenu(!showAddMenu)}>
-          <Plus className="h-4 w-4 mr-2" /> Add Section
+        <Button variant="outline" className="w-full border-dashed py-6" onClick={() => setShowAddMenu(!showAddMenu)}>
+          <Plus className="h-4 w-4 mr-2" /> Add Section Block
         </Button>
         {showAddMenu && (
-          <Card className="absolute z-10 mt-2 w-full max-h-64 overflow-y-auto">
-            <CardContent className="p-2 grid grid-cols-2 gap-1">
+          <Card className="absolute z-20 mt-2 w-full max-h-72 overflow-y-auto shadow-xl border">
+            <CardContent className="p-3 grid grid-cols-2 md:grid-cols-3 gap-2">
               {SECTION_TYPES.map((type) => (
-                <Button key={type.value} variant="ghost" size="sm" className="justify-start text-xs" onClick={() => addSection(type.value)}>
-                  {type.label}
+                <Button key={type.value} variant="ghost" size="sm" className="justify-start text-xs h-9 border" onClick={() => addSection(type.value)}>
+                  <Plus className="h-3 w-3 mr-1 text-primary" /> {type.label}
                 </Button>
               ))}
             </CardContent>
@@ -147,14 +244,274 @@ export function HomepageEditor({ config }: HomepageEditorProps) {
         )}
       </div>
 
+      <MediaPicker
+        open={!!activeMediaTarget}
+        onOpenChange={(open) => { if (!open) setActiveMediaTarget(null); }}
+        onSelect={handleMediaSelect}
+      />
+
       <ConfirmDialog
         open={confirmPublish}
         onOpenChange={setConfirmPublish}
-        title={config.status === "published" ? "Unpublish Homepage?" : "Publish Homepage?"}
-        description={config.status === "published" ? "The homepage will revert to draft state." : "The current sections will be live on the public website."}
+        title={status === "published" ? "Unpublish Homepage?" : "Save & Publish Homepage?"}
+        description={status === "published" ? "The homepage will revert to draft state." : "Your latest section updates will be saved and published live to the homepage."}
         onConfirm={handlePublish}
         loading={isPending}
       />
     </div>
   );
+}
+
+function SectionContentEditor({
+  section,
+  index: _index,
+  onChange,
+  onOpenMedia,
+}: {
+  section: HomepageSectionInput;
+  index: number;
+  onChange: (field: string, val: any) => void;
+  onOpenMedia: (field: string, subIndex?: number) => void;
+}) {
+  const content = (section.content || {}) as Record<string, any>;
+
+  switch (section.type) {
+    case "hero":
+      return (
+        <div className="space-y-3 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs">Main Title</Label>
+            <Input value={content.title || ""} onChange={(e) => onChange("title", e.target.value)} placeholder="Welcome to St. Lawrence School" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Subtitle</Label>
+            <Input value={content.subtitle || ""} onChange={(e) => onChange("subtitle", e.target.value)} placeholder="Empowering Minds, Shaping Futures" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Button Text</Label>
+              <Input value={content.buttonText || ""} onChange={(e) => onChange("buttonText", e.target.value)} placeholder="Apply Now" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Button URL</Label>
+              <Input value={content.buttonUrl || ""} onChange={(e) => onChange("buttonUrl", e.target.value)} placeholder="/admissions" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Background Image URL</Label>
+            <div className="flex gap-2">
+              <Input value={content.backgroundImage || ""} onChange={(e) => onChange("backgroundImage", e.target.value)} placeholder="https://..." />
+              <Button type="button" variant="outline" size="sm" onClick={() => onOpenMedia("backgroundImage")}>
+                <ImageIcon className="h-4 w-4 mr-1" /> Select
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+
+    case "announcement":
+      return (
+        <div className="space-y-2 pt-2">
+          <Label className="text-xs">Announcement Text</Label>
+          <Input value={content.text || ""} onChange={(e) => onChange("text", e.target.value)} placeholder="Admissions open for Academic Session 2025–26!" />
+        </div>
+      );
+
+    case "introduction":
+    case "principal-message":
+    case "chairman-message":
+      return (
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Author Name</Label>
+              <Input value={content.name || ""} onChange={(e) => onChange("name", e.target.value)} placeholder="Dr. R. K. Sharma" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Designation</Label>
+              <Input value={content.designation || ""} onChange={(e) => onChange("designation", e.target.value)} placeholder="Principal" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Subtitle / Tagline</Label>
+            <Input value={content.subtitle || ""} onChange={(e) => onChange("subtitle", e.target.value)} placeholder="Message from the Desk" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Detailed Description / Message</Label>
+            <Textarea value={content.description || ""} onChange={(e) => onChange("description", e.target.value)} rows={4} placeholder="Write message..." />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Image URL</Label>
+            <div className="flex gap-2">
+              <Input value={content.image || ""} onChange={(e) => onChange("image", e.target.value)} placeholder="https://..." />
+              <Button type="button" variant="outline" size="sm" onClick={() => onOpenMedia("image")}>
+                <ImageIcon className="h-4 w-4 mr-1" /> Select
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+
+    case "statistics": {
+      const items = (content.items || []) as { value: string; label: string }[];
+      const addItem = () => onChange("items", [...items, { value: "100+", label: "New Stat" }]);
+      const removeItem = (i: number) => onChange("items", items.filter((_, idx) => idx !== i));
+      const updateItem = (i: number, f: "value" | "label", v: string) => {
+        const copy = [...items];
+        if (copy[i]) {
+          copy[i] = { ...copy[i]!, [f]: v };
+          onChange("items", copy);
+        }
+      };
+
+      return (
+        <div className="space-y-3 pt-2">
+          <Label className="text-xs font-semibold">Stat Items</Label>
+          {items.map((item, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <Input value={item.value} onChange={(e) => updateItem(i, "value", e.target.value)} placeholder="Value (e.g. 100%)" className="w-1/3" />
+              <Input value={item.label} onChange={(e) => updateItem(i, "label", e.target.value)} placeholder="Label (e.g. Pass Rate)" className="flex-1" />
+              <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(i)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={addItem}><Plus className="h-3.5 w-3.5 mr-1" /> Add Stat Item</Button>
+        </div>
+      );
+    }
+
+    case "programs":
+    case "facilities":
+    case "achievements": {
+      const items = (content.items || []) as { title: string; description?: string; image?: string }[];
+      const addItem = () => onChange("items", [...items, { title: "New Item", description: "", image: "" }]);
+      const removeItem = (i: number) => onChange("items", items.filter((_, idx) => idx !== i));
+      const updateItem = (i: number, f: string, v: string) => {
+        const copy = [...items];
+        if (copy[i]) {
+          copy[i] = { ...copy[i]!, [f]: v };
+          onChange("items", copy);
+        }
+      };
+
+      return (
+        <div className="space-y-3 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs">Section Subtitle / Intro</Label>
+            <Input value={content.description || ""} onChange={(e) => onChange("description", e.target.value)} placeholder="Brief overview..." />
+          </div>
+          <Label className="text-xs font-semibold">Cards / Items</Label>
+          {items.map((item, i) => (
+            <div key={i} className="p-3 border rounded-md space-y-2 bg-muted/20">
+              <div className="flex gap-2">
+                <Input value={item.title} onChange={(e) => updateItem(i, "title", e.target.value)} placeholder="Item Title" className="flex-1" />
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(i)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+              </div>
+              <Input value={item.description || ""} onChange={(e) => updateItem(i, "description", e.target.value)} placeholder="Item Description" />
+              <div className="flex gap-2">
+                <Input value={item.image || ""} onChange={(e) => updateItem(i, "image", e.target.value)} placeholder="Image URL" />
+                <Button type="button" variant="outline" size="sm" onClick={() => onOpenMedia("image", i)}><ImageIcon className="h-4 w-4 mr-1" /> Select</Button>
+              </div>
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={addItem}><Plus className="h-3.5 w-3.5 mr-1" /> Add Card Item</Button>
+        </div>
+      );
+    }
+
+    case "cta":
+    case "contact-cta":
+      return (
+        <div className="space-y-3 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs">Description</Label>
+            <Input value={content.description || ""} onChange={(e) => onChange("description", e.target.value)} placeholder="Ready to join our institution?" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Button Text</Label>
+              <Input value={content.buttonText || ""} onChange={(e) => onChange("buttonText", e.target.value)} placeholder="Contact Us" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Button URL</Label>
+              <Input value={content.buttonUrl || ""} onChange={(e) => onChange("buttonUrl", e.target.value)} placeholder="/contact" />
+            </div>
+          </div>
+        </div>
+      );
+
+    case "video":
+      return (
+        <div className="space-y-2 pt-2">
+          <Label className="text-xs">Video Embed URL (e.g. https://www.youtube.com/embed/...)</Label>
+          <Input value={content.videoUrl || ""} onChange={(e) => onChange("videoUrl", e.target.value)} placeholder="https://www.youtube.com/embed/..." />
+        </div>
+      );
+
+    case "faq": {
+      const items = (content.items || []) as { question: string; answer: string }[];
+      const addItem = () => onChange("items", [...items, { question: "New Question", answer: "" }]);
+      const removeItem = (i: number) => onChange("items", items.filter((_, idx) => idx !== i));
+      const updateItem = (i: number, f: "question" | "answer", v: string) => {
+        const copy = [...items];
+        if (copy[i]) {
+          copy[i] = { ...copy[i]!, [f]: v };
+          onChange("items", copy);
+        }
+      };
+
+      return (
+        <div className="space-y-3 pt-2">
+          <Label className="text-xs font-semibold">FAQ Items</Label>
+          {items.map((item, i) => (
+            <div key={i} className="p-3 border rounded-md space-y-2 bg-muted/20">
+              <div className="flex gap-2">
+                <Input value={item.question} onChange={(e) => updateItem(i, "question", e.target.value)} placeholder="Question" className="flex-1" />
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(i)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+              </div>
+              <Textarea value={item.answer} onChange={(e) => updateItem(i, "answer", e.target.value)} placeholder="Answer" rows={2} />
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={addItem}><Plus className="h-3.5 w-3.5 mr-1" /> Add FAQ Item</Button>
+        </div>
+      );
+    }
+
+    default:
+      return (
+        <div className="space-y-2 pt-2">
+          <Label className="text-xs">Description / Content</Label>
+          <Textarea value={content.description || ""} onChange={(e) => onChange("description", e.target.value)} rows={3} placeholder="Section text content..." />
+        </div>
+      );
+  }
+}
+
+function getDefaultContentForType(type: string): Record<string, any> {
+  switch (type) {
+    case "hero":
+      return { title: "Welcome to St. Lawrence School", subtitle: "Nurturing Minds, Building Futures", buttonText: "Apply Now", buttonUrl: "/admissions", backgroundImage: "" };
+    case "announcement":
+      return { text: "Admissions open for the upcoming academic session." };
+    case "introduction":
+      return { subtitle: "About Our Institution", description: "Providing holistic education with high moral standards.", image: "" };
+    case "principal-message":
+      return { name: "Dr. R. K. Sharma", designation: "Principal", subtitle: "Principal's Message", description: "Welcome to a center of academic excellence.", image: "" };
+    case "chairman-message":
+      return { name: "Shri V. K. Gupta", designation: "Chairman", subtitle: "Chairman's Message", description: "Guiding future leaders towards global success.", image: "" };
+    case "statistics":
+      return { items: [{ value: "100%", label: "CBSE Pass Result" }, { value: "50+", label: "Expert Faculty" }, { value: "2000+", label: "Active Students" }, { value: "15+", label: "Sports & Labs" }] };
+    case "programs":
+      return { description: "Explore our academic offerings from Primary to Senior Secondary levels.", items: [{ title: "Primary School", description: "Classes I to V", image: "" }, { title: "Middle School", description: "Classes VI to VIII", image: "" }, { title: "Senior Secondary", description: "Science, Commerce, Arts", image: "" }] };
+    case "facilities":
+      return { description: "World-class facilities supporting all-round development.", items: [{ title: "Science & Computer Labs", description: "State of the art practical labs", image: "" }, { title: "Library & E-Resources", description: "Over 10,000 books and digital archives", image: "" }, { title: "Sports Complex", description: "Playgrounds for indoor and outdoor sports", image: "" }] };
+    case "cta":
+    case "contact-cta":
+      return { description: "Take the first step towards your child's bright future.", buttonText: "Get in Touch", buttonUrl: "/contact" };
+    case "video":
+      return { videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" };
+    case "faq":
+      return { items: [{ question: "What are the school timings?", answer: "Primary: 8:00 AM – 1:30 PM | Senior: 8:00 AM – 2:30 PM" }, { question: "Is school transport available?", answer: "Yes, GPS-tracked buses cover all major routes in the city." }] };
+    default:
+      return { description: "" };
+  }
 }
