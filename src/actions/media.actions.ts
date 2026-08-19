@@ -18,7 +18,7 @@ export async function getMedia(searchParams: Record<string, string | string[] | 
   return mediaService.findPaginated(params, extraFilter);
 }
 
-export async function uploadMedia(formData: FormData): Promise<ActionState & { id?: string }> {
+export async function uploadMedia(formData: FormData): Promise<ActionState & { id?: string; url?: string }> {
   const session = await requirePermission("media.upload");
   const file = formData.get("file") as File | null;
   if (!file) return { error: "No file provided" };
@@ -53,7 +53,7 @@ export async function uploadMedia(formData: FormData): Promise<ActionState & { i
   } as never);
 
   revalidatePath("/admin/media");
-  return { success: "File uploaded", id: media._id.toString() };
+  return { success: "File uploaded", id: media._id.toString(), url: media.url };
 }
 
 export async function updateMedia(id: string, data: { alt?: string; caption?: string; folder?: string; tags?: string[] }): Promise<ActionState> {

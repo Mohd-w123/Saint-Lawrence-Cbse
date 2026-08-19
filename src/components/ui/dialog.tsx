@@ -16,7 +16,7 @@ function DialogTrigger({ children, render, ...props }: DialogPrimitive.Trigger.P
     return <DialogPrimitive.Trigger data-slot="dialog-trigger" render={render} nativeButton={false} {...props} />
   }
   if (React.isValidElement(children) && typeof children.type !== "string") {
-    return <DialogPrimitive.Trigger data-slot="dialog-trigger" render={children} nativeButton={false} {...props} />
+    return <DialogPrimitive.Trigger data-slot="dialog-trigger" render={children} nativeButton={true} {...props} />
   }
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props}>{children}</DialogPrimitive.Trigger>
 }

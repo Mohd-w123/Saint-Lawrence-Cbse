@@ -29,7 +29,7 @@ export function MediaUploadDialog({ open, onOpenChange }: MediaUploadDialogProps
       return;
     }
     if (file.size > MAX_FILE_SIZE) {
-      toast.error("File exceeds 10MB limit");
+      toast.error("File exceeds 25MB limit");
       return;
     }
 
@@ -37,13 +37,23 @@ export function MediaUploadDialog({ open, onOpenChange }: MediaUploadDialogProps
     formData.set("file", file);
 
     startTransition(async () => {
-      const result = await uploadMedia(formData);
-      if (result.error) toast.error(result.error);
-      else {
-        toast.success("File uploaded");
-        setFile(null);
-        formRef.current?.reset();
-        onOpenChange(false);
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const result = await res.json();
+
+        if (!res.ok || result.error) {
+          toast.error(result.error || "Upload failed");
+        } else {
+          toast.success("File uploaded successfully");
+          setFile(null);
+          formRef.current?.reset();
+          onOpenChange(false);
+        }
+      } catch {
+        toast.error("Upload failed");
       }
     });
   };

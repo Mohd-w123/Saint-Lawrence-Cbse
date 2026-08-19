@@ -78,7 +78,7 @@ export const adminNavigation: NavGroup[] = [
     title: "System",
     items: [
       { title: "Users", href: "/admin/users", icon: Users, permission: "users.view" },
-      { title: "Audit Log", href: "/admin/audit", icon: ScrollText, permission: "audit.view" },
+      { title: "Audit Log", href: "/admin/audit-logs", icon: ScrollText, permission: "audit.view" },
       { title: "Settings", href: "/admin/settings", icon: Settings, permission: "settings.view" },
     ],
   },
