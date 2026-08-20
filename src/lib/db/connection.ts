@@ -25,12 +25,13 @@ export async function connectDB(): Promise<typeof mongoose> {
     return cached.conn;
   }
 
-  if (!MONGODB_URI) {
-    throw new Error("MONGODB_URI environment variable is not defined");
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error("MONGODB_URI environment variable is not defined. Please configure it in your environment variables or Vercel project settings.");
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
+    cached.promise = mongoose.connect(uri, {
       bufferCommands: false,
     });
   }
