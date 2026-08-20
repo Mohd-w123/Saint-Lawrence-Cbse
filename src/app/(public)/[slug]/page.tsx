@@ -56,6 +56,49 @@ export default async function DynamicPage({ params }: Props) {
             {block.type === "rich-text" && typeof block.content.html === "string" && (
               <RichTextRenderer content={block.content.html} />
             )}
+
+            {block.type === "team-grid" && Array.isArray(block.content.members) && (
+              <div className="my-10">
+                {Boolean(block.content.title) && (
+                  <div className="text-center max-w-2xl mx-auto mb-8">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-[#002a54]">{String(block.content.title)}</h3>
+                    {Boolean(block.content.subtitle) && (
+                      <p className="text-sm text-slate-600 mt-1 font-normal">{String(block.content.subtitle)}</p>
+                    )}
+                    <div className="w-12 h-1 bg-[#ffb300] mx-auto mt-3 rounded-full" />
+                  </div>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                  {(block.content.members as any[]).map((member, mIdx) => (
+                    <div
+                      key={mIdx}
+                      className="rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full group text-center"
+                    >
+                      <div className="relative aspect-[4/4.5] w-full overflow-hidden bg-slate-100">
+                        <img
+                          src={member.image || "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=600&auto=format&fit=crop"}
+                          alt={member.name}
+                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                      <div className="p-5 flex flex-col flex-1 bg-white">
+                        <h4 className="font-bold text-base sm:text-lg text-[#002a54] mb-0.5 leading-snug">
+                          {member.name}
+                        </h4>
+                        <p className="text-xs font-bold text-[#004080] tracking-wider uppercase mb-2">
+                          {member.designation}
+                        </p>
+                        {member.bio && (
+                          <p className="text-xs text-slate-600 leading-relaxed font-normal mt-auto">
+                            {member.bio}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {block.type === "image" && typeof block.content.url === "string" && (
               <figure className="my-8">

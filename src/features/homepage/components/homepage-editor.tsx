@@ -717,39 +717,95 @@ function SectionContentEditor({
       );
 
     case "introduction":
-    case "principal-message":
-    case "chairman-message":
       return (
         <div className="space-y-3 pt-2">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs">Author Name</Label>
-              <Input value={content.name || ""} onChange={(e) => onChange("name", e.target.value)} placeholder="Dr. R. K. Sharma" />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Designation</Label>
-              <Input value={content.designation || ""} onChange={(e) => onChange("designation", e.target.value)} placeholder="Principal" />
-            </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Subtitle / Top Tagline (Optional)</Label>
+            <Input
+              value={content.subtitle || ""}
+              onChange={(e) => onChange("subtitle", e.target.value)}
+              placeholder="e.g. WELCOME TO SAINT LAWRENCE"
+            />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs">Subtitle / Tagline</Label>
-            <Input value={content.subtitle || ""} onChange={(e) => onChange("subtitle", e.target.value)} placeholder="Message from the Desk" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Detailed Description / Message</Label>
-            <Textarea value={content.description || ""} onChange={(e) => onChange("description", e.target.value)} rows={4} placeholder="Write message..." />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Image URL</Label>
-            <div className="flex gap-2">
-              <Input value={content.image || ""} onChange={(e) => onChange("image", e.target.value)} placeholder="https://..." />
-              <Button type="button" variant="outline" size="sm" onClick={() => onOpenMedia("image")}>
-                <ImageIcon className="h-4 w-4 mr-1" /> Select
-              </Button>
-            </div>
+            <Label className="text-xs">Description / Paragraph Text</Label>
+            <Textarea
+              value={content.description || ""}
+              onChange={(e) => onChange("description", e.target.value)}
+              rows={4}
+              placeholder="At Saint Lawrence Public School, we believe every child learns differently..."
+            />
           </div>
         </div>
       );
+
+    case "director-message":
+    case "chairman-message":
+    case "principal-message": {
+      const defaultDesignation =
+        section.type === "director-message"
+          ? "DIRECTOR"
+          : section.type === "chairman-message"
+            ? "CHAIRMAN"
+            : "PRINCIPAL";
+
+      return (
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Top Subtitle / Vision Tagline</Label>
+            <Input
+              value={content.subtitle || ""}
+              onChange={(e) => onChange("subtitle", e.target.value)}
+              placeholder="At Saint Lawrence Public School, leadership is rooted in vision, dedication..."
+              className="text-xs"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold">Leader Full Name</Label>
+              <Input
+                value={content.name || ""}
+                onChange={(e) => onChange("name", e.target.value)}
+                placeholder="Mr. Vikram Singh Rajawat"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold">Designation Tag (Uppercase)</Label>
+              <Input
+                value={content.designation || ""}
+                onChange={(e) => onChange("designation", e.target.value)}
+                placeholder={defaultDesignation}
+                className="text-xs"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold">Leader Portrait Photo</Label>
+            <ImageSettingInput
+              value={content.image || ""}
+              onChange={(url) => onChange("image", url)}
+              placeholder="Upload or paste portrait photo URL"
+              label={content.name || defaultDesignation}
+              description="High quality vertical portrait photo (Recommended aspect ratio 3:4 or 4:5)."
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Message Content (Separate paragraphs with an empty line)</Label>
+            <Textarea
+              value={content.description || ""}
+              onChange={(e) => onChange("description", e.target.value)}
+              rows={6}
+              placeholder="Welcome to Saint Lawrence Public School...\n\nUnder our leadership, we strive..."
+              className="text-xs"
+            />
+          </div>
+        </div>
+      );
+    }
 
     case "statistics": {
       const items = (content.items || []) as { value: string; label: string }[];
@@ -783,6 +839,322 @@ function SectionContentEditor({
       );
     }
 
+    case "news": {
+      const items = (content.items || []) as {
+        title: string;
+        date?: string;
+        category?: string;
+        excerpt?: string;
+        image?: string;
+        url?: string;
+      }[];
+
+      const addItem = () =>
+        onChange("items", [
+          ...items,
+          {
+            title: "New School Activity / Event",
+            date: "Recent Date",
+            category: "CAMPUS EVENT",
+            excerpt: "Write brief summary of the news...",
+            image: "",
+            url: "/news",
+          },
+        ]);
+
+      const removeItem = (i: number) => onChange("items", items.filter((_, idx) => idx !== i));
+      const updateItem = (i: number, f: string, v: string) => {
+        const copy = [...items];
+        if (copy[i]) {
+          copy[i] = { ...copy[i]!, [f]: v };
+          onChange("items", copy);
+        }
+      };
+
+      return (
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Section Subtitle / Description</Label>
+            <Input
+              value={content.subtitle || ""}
+              onChange={(e) => onChange("subtitle", e.target.value)}
+              placeholder="Stay up to date with events, activities, and updates..."
+              className="text-xs"
+            />
+          </div>
+
+          <div className="rounded-lg border bg-blue-50/50 p-3 text-xs text-blue-900 flex items-center justify-between">
+            <span>
+              ℹ️ By default, this section dynamically displays your latest published news from the <strong>News Manager</strong>. You can also specify custom items below.
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold">Custom News Slides ({items.length})</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addItem} className="text-xs h-7">
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Custom Article Slide
+              </Button>
+            </div>
+
+            {items.map((item, i) => (
+              <div key={i} className="p-3.5 border rounded-lg space-y-3 bg-muted/20">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-semibold text-foreground">Slide #{i + 1}</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(i)} className="h-6 w-6 p-0 text-destructive">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Article Title</Label>
+                    <Input
+                      value={item.title}
+                      onChange={(e) => updateItem(i, "title", e.target.value)}
+                      placeholder="Title"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Category Badge (e.g. EDUCATION WORLD AWARD)</Label>
+                    <Input
+                      value={item.category || ""}
+                      onChange={(e) => updateItem(i, "category", e.target.value)}
+                      placeholder="EDUCATION WORLD AWARD"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Date Tag (e.g. 8th - 10th July&apos;26)</Label>
+                    <Input
+                      value={item.date || ""}
+                      onChange={(e) => updateItem(i, "date", e.target.value)}
+                      placeholder="8th - 10th July'26"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Redirect URL (e.g. /news/inter-house-sports)</Label>
+                    <Input
+                      value={item.url || ""}
+                      onChange={(e) => updateItem(i, "url", e.target.value)}
+                      placeholder="/news/article-slug"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Excerpt / Summary</Label>
+                  <Textarea
+                    value={item.excerpt || ""}
+                    onChange={(e) => updateItem(i, "excerpt", e.target.value)}
+                    placeholder="Brief description..."
+                    rows={2}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Featured Image URL</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={item.image || ""}
+                      onChange={(e) => updateItem(i, "image", e.target.value)}
+                      placeholder="https://..."
+                      className="text-xs h-8"
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={() => onOpenMedia("image", i)} className="text-xs h-8">
+                      <ImageIcon className="h-3.5 w-3.5 mr-1" /> Select
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    case "vision": {
+      const items = (content.items || []) as { title: string; tag?: string; description?: string }[];
+      const addItem = () => onChange("items", [...items, { title: "Stage Name", tag: "GRADES I-II", description: "" }]);
+      const removeItem = (i: number) => onChange("items", items.filter((_, idx) => idx !== i));
+      const updateItem = (i: number, f: string, v: string) => {
+        const copy = [...items];
+        if (copy[i]) {
+          copy[i] = { ...copy[i]!, [f]: v };
+          onChange("items", copy);
+        }
+      };
+
+      return (
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Vision Statement / Description</Label>
+            <Textarea
+              value={content.description || ""}
+              onChange={(e) => onChange("description", e.target.value)}
+              placeholder="Recognised as one of Jaipur's most trusted schools..."
+              rows={3}
+              className="text-xs"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold">Developmental Stages ({items.length})</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addItem} className="text-xs h-7">
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Stage Card
+              </Button>
+            </div>
+
+            {items.map((item, i) => (
+              <div key={i} className="p-3.5 border rounded-lg space-y-2.5 bg-muted/20">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-semibold text-foreground">Stage #{i + 1}</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(i)} className="h-6 w-6 p-0 text-destructive">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Stage Title (e.g. Chetna, Ananda)</Label>
+                    <Input
+                      value={item.title}
+                      onChange={(e) => updateItem(i, "title", e.target.value)}
+                      placeholder="Title"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Grades Tag (e.g. EARLY YEAR I, II, & III)</Label>
+                    <Input
+                      value={item.tag || ""}
+                      onChange={(e) => updateItem(i, "tag", e.target.value)}
+                      placeholder="GRADES I-II"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Description</Label>
+                  <Textarea
+                    value={item.description || ""}
+                    onChange={(e) => updateItem(i, "description", e.target.value)}
+                    placeholder="Describe this learning stage..."
+                    rows={2}
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    case "manifesto": {
+      const items = (content.items || []) as { title: string; description?: string }[];
+      const addItem = () => onChange("items", [...items, { title: "New Principle", description: "" }]);
+      const removeItem = (i: number) => onChange("items", items.filter((_, idx) => idx !== i));
+      const updateItem = (i: number, f: string, v: string) => {
+        const copy = [...items];
+        if (copy[i]) {
+          copy[i] = { ...copy[i]!, [f]: v };
+          onChange("items", copy);
+        }
+      };
+
+      return (
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Manifesto Overview / Subtitle</Label>
+            <Textarea
+              value={content.description || ""}
+              onChange={(e) => onChange("description", e.target.value)}
+              placeholder="Equal Opportunity for Every Learner..."
+              rows={2}
+              className="text-xs"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Featured Photo</Label>
+            <ImageSettingInput
+              value={(content.image as string) || ""}
+              onChange={(url) => onChange("image", url)}
+              placeholder="Upload leader / manifesto photo"
+              label="Manifesto Photo"
+              description="High quality photo (Recommended 4:3 aspect ratio)."
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Button Text</Label>
+              <Input
+                value={content.buttonText || ""}
+                onChange={(e) => onChange("buttonText", e.target.value)}
+                placeholder="Apply Now"
+                className="text-xs h-8"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Button URL</Label>
+              <Input
+                value={content.buttonUrl || ""}
+                onChange={(e) => onChange("buttonUrl", e.target.value)}
+                placeholder="/admissions"
+                className="text-xs h-8"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold">Manifesto Points ({items.length})</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addItem} className="text-xs h-7">
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Principle
+              </Button>
+            </div>
+
+            {items.map((item, i) => (
+              <div key={i} className="p-3 border rounded-lg space-y-2 bg-muted/20">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-semibold text-foreground">Point #{i + 1}</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(i)} className="h-6 w-6 p-0 text-destructive">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <Input
+                  value={item.title}
+                  onChange={(e) => updateItem(i, "title", e.target.value)}
+                  placeholder="Principle Title (e.g. Personalized Learning)"
+                  className="text-xs h-8"
+                />
+                <Textarea
+                  value={item.description || ""}
+                  onChange={(e) => updateItem(i, "description", e.target.value)}
+                  placeholder="Principle description..."
+                  rows={2}
+                  className="text-xs"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    case "student-development":
+    case "why-choose-us":
     case "programs":
     case "facilities":
     case "achievements": {
@@ -832,18 +1204,47 @@ function SectionContentEditor({
       return (
         <div className="space-y-3 pt-2">
           <div className="space-y-1">
-            <Label className="text-xs">Description / Text</Label>
-            <Textarea value={content.description || ""} onChange={(e) => onChange("description", e.target.value)} placeholder="Ready to join us?" rows={2} />
+            <Label className="text-xs font-semibold">Description / Subtitle</Label>
+            <Textarea
+              value={content.description || ""}
+              onChange={(e) => onChange("description", e.target.value)}
+              placeholder="Saint Lawrence Public School is recognised as a leading CBSE school..."
+              rows={3}
+              className="text-xs"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="text-xs">Button Text</Label>
-              <Input value={content.buttonText || ""} onChange={(e) => onChange("buttonText", e.target.value)} placeholder="Get in Touch" />
+              <Input
+                value={content.buttonText || ""}
+                onChange={(e) => onChange("buttonText", e.target.value)}
+                placeholder="Apply Now"
+                className="text-xs h-8"
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Button URL</Label>
-              <Input value={content.buttonUrl || ""} onChange={(e) => onChange("buttonUrl", e.target.value)} placeholder="/contact" />
+              <Input
+                value={content.buttonUrl || ""}
+                onChange={(e) => onChange("buttonUrl", e.target.value)}
+                placeholder="/admissions"
+                className="text-xs h-8"
+              />
             </div>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Background Image (Optional)</Label>
+            <ImageSettingInput
+              value={(content.image as string) || (content.backgroundImage as string) || ""}
+              onChange={(url) => {
+                onChange("image", url);
+                onChange("backgroundImage", url);
+              }}
+              placeholder="Upload or paste background image URL (Optional)"
+              label="CTA Background"
+              description="School campus / ground background image."
+            />
           </div>
         </div>
       );
@@ -885,6 +1286,113 @@ function SectionContentEditor({
       );
     }
 
+    case "testimonials": {
+      const items = (content.items || []) as {
+        name: string;
+        role?: string;
+        quote: string;
+        avatar?: string;
+      }[];
+
+      const addItem = () =>
+        onChange("items", [
+          ...items,
+          {
+            name: "Dr. Anju Sharma",
+            role: "Mother of Nyra Sharma (Grade I-Tulip)",
+            quote:
+              "As a doctor and mother, I value Saint Lawrence Public School's nurturing environment. The school combines academic excellence with holistic development, fostering empathy, confidence, and curiosity.",
+            avatar: "",
+          },
+        ]);
+
+      const removeItem = (i: number) => onChange("items", items.filter((_, idx) => idx !== i));
+      const updateItem = (i: number, f: string, v: string) => {
+        const copy = [...items];
+        if (copy[i]) {
+          copy[i] = { ...copy[i]!, [f]: v };
+          onChange("items", copy);
+        }
+      };
+
+      return (
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold">Section Subtitle / Description (Optional)</Label>
+            <Input
+              value={content.subtitle || ""}
+              onChange={(e) => onChange("subtitle", e.target.value)}
+              placeholder="What parents say about our school..."
+              className="text-xs"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold">Testimonial Reviews ({items.length})</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addItem} className="text-xs h-7">
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Testimonial
+              </Button>
+            </div>
+
+            {items.map((item, i) => (
+              <div key={i} className="p-3.5 border rounded-lg space-y-3 bg-muted/20">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-semibold text-foreground">Review #{i + 1}</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(i)} className="h-6 w-6 p-0 text-destructive">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Parent Name</Label>
+                    <Input
+                      value={item.name}
+                      onChange={(e) => updateItem(i, "name", e.target.value)}
+                      placeholder="Dr. Anju Sharma"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Parent Role / Child Grade</Label>
+                    <Input
+                      value={item.role || ""}
+                      onChange={(e) => updateItem(i, "role", e.target.value)}
+                      placeholder="Mother of Nyra Sharma (Grade I-Tulip)"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Parent Avatar Photo (Optional)</Label>
+                  <ImageSettingInput
+                    value={item.avatar || ""}
+                    onChange={(url) => updateItem(i, "avatar", url)}
+                    placeholder="Upload or paste parent photo URL (Optional)"
+                    label={item.name || `Review ${i + 1}`}
+                    description="Square parent portrait photo (Optional)."
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Testimonial Quote</Label>
+                  <Textarea
+                    value={item.quote || ""}
+                    onChange={(e) => updateItem(i, "quote", e.target.value)}
+                    placeholder="Write testimonial quote..."
+                    rows={3}
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     default:
       return (
         <div className="space-y-2 pt-2">
@@ -916,11 +1424,230 @@ function getDefaultContentForType(type: string): Record<string, any> {
     case "announcement":
       return { text: "Admissions open for the upcoming academic session." };
     case "introduction":
-      return { subtitle: "About Our Institution", description: "Providing holistic education with high moral standards.", image: "" };
-    case "principal-message":
-      return { name: "Dr. R. K. Sharma", designation: "Principal", subtitle: "Principal's Message", description: "Welcome to a center of academic excellence.", image: "" };
+      return {
+        subtitle: "",
+        description:
+          "At Saint Lawrence Public School, we believe every child learns differently — and thrives when their unique pace is respected. Our approach builds genuine curiosity, strong learning habits, and real confidence at every stage of growth. Students don't just follow a curriculum; they own their learning journey. That's what makes Saint Lawrence one of the most trusted English-medium CBSE schools in Jaipur.",
+      };
+    case "vision":
+      return {
+        description:
+          "Recognised as one of Jaipur's most trusted schools, SLPS is dedicated to nurturing empathy, integrity, perseverance, and autonomy in every child — shaping young people who are confident, capable, and ready to serve the world with purpose and zeal.",
+        items: [
+          {
+            title: "Chetna",
+            tag: "EARLY YEAR I, II, & III",
+            description:
+              "The foundational preschool stage. Chetna embodies consciousness, awareness, perception, and insight, gently nurturing young minds to explore, understand, and grow.",
+          },
+          {
+            title: "Ananda",
+            tag: "GRADES I-II",
+            description:
+              "Joy, laughter, and glee open an impressionable mind to learning. We call this early phase of enchantment and bliss 'Ananda', where the love of school begins.",
+          },
+          {
+            title: "Kalpana",
+            tag: "GRADES III-V",
+            description:
+              "Children imagine boldly and explore inventive ideas. Flights of fancy fuel their thinking — we call this 'Kalpana', the innate creative power of the mind.",
+          },
+          {
+            title: "Jigyasa",
+            tag: "GRADES VI-VIII",
+            description:
+              "A wealth of experiences sparks genuine curiosity. This is the right moment to introduce scientific enquiry as a growing mind develops a deeper 'Jigyasa'.",
+          },
+          {
+            title: "Sadhana",
+            tag: "GRADES IX-XII",
+            description:
+              "The drive to express skill and talent takes hold. Through practice and perseverance, this phase of 'Sadhana' empowers the self in its totality.",
+          },
+        ],
+      };
+    case "student-development":
+      return {
+        subtitle:
+          "At SLPS, holistic development isn't a buzzword — it's built into every school day. We nurture six dimensions of growth that prepare students not just for exams, but for life.",
+        items: [
+          {
+            title: "Establishing Identity",
+            description:
+              "Understanding who they are and what they value is essential to building a sense of purpose and direction in life.",
+            image:
+              "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop",
+          },
+          {
+            title: "Clarifying Purpose",
+            description:
+              "A clear sense of purpose gives students motivation, direction, and focus for their education and career paths.",
+            image:
+              "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800&auto=format&fit=crop",
+          },
+          {
+            title: "Developing Integrity",
+            description:
+              "Integrity means becoming responsible, trustworthy individuals who make sound decisions and stand up for their beliefs.",
+            image:
+              "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop",
+          },
+          {
+            title: "Developing Competence",
+            description:
+              "Students gain the skills and knowledge they need to succeed in school, work, and life through problem-solving and critical thinking.",
+            image:
+              "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop",
+          },
+          {
+            title: "Managing Emotions",
+            description:
+              "Learning to regulate emotions, cope with stress, and make healthy decisions supports both personal and academic lives.",
+            image:
+              "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800&auto=format&fit=crop",
+          },
+          {
+            title: "Becoming Autonomous",
+            description:
+              "Autonomy is about independence and self-determination — taking ownership of one's learning and decisions.",
+            image:
+              "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop",
+          },
+        ],
+      };
+    case "manifesto":
+      return {
+        description:
+          "Equal Opportunity for Every Learner: We make sure every child, regardless of background or ability, gets the resources, support, and encouragement they need to succeed.",
+        buttonText: "Apply Now",
+        buttonUrl: "/admissions",
+        image:
+          "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1000&auto=format&fit=crop",
+        items: [
+          {
+            title: "Personalized Learning",
+            description:
+              "Every child learns differently. We help each student find their own pace and path through personal attention, hands-on projects, and smart use of technology.",
+          },
+          {
+            title: "Equal Opportunity for Every Learner",
+            description:
+              "We make sure every child — regardless of background or ability — gets the resources, support, and encouragement needed to succeed.",
+          },
+          {
+            title: "Thinking and Problem-solving",
+            description:
+              "Our classrooms are places where questions are encouraged and ideas are explored. Students learn to think deeply and find real-world solutions.",
+          },
+          {
+            title: "Creativity and Innovation",
+            description:
+              "Whether through art, science, or entrepreneurship, our students learn to create, experiment, and express their ideas with confidence.",
+          },
+          {
+            title: "Teamwork and Communication",
+            description:
+              "Group projects, discussions, and presentations teach students how to share ideas, listen to others, and lead with empathy.",
+          },
+        ],
+      };
+    case "why-choose-us":
+      return {
+        subtitle: "",
+        items: [
+          {
+            title: "Good Teachers and Staffs",
+            description:
+              "Our dedicated faculty brings expertise, warmth, and personal attention to every classroom, ensuring each child feels seen and supported.",
+            image:
+              "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800&auto=format&fit=crop",
+          },
+          {
+            title: "We Value Good Characters",
+            description:
+              "Character education is woven into daily life at Saint Lawrence — building integrity, empathy, and responsibility alongside academic achievement.",
+            image:
+              "https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800&auto=format&fit=crop",
+          },
+          {
+            title: "Your Children are Safe",
+            description:
+              "A secure campus with trained staff gives parents peace of mind while students explore, learn, and grow with confidence.",
+            image:
+              "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop",
+          },
+        ],
+      };
+    case "director-message":
+      return {
+        name: "Mr. Vikram Singh Rajawat",
+        designation: "DIRECTOR",
+        subtitle:
+          "At Saint Lawrence Public School, leadership is rooted in vision, dedication, and a deep commitment to nurturing every child's potential.",
+        description:
+          "Welcome to Saint Lawrence Public School. Our institution stands as a beacon of quality education on Goner Road, Jaipur — committed to shaping confident, compassionate, and capable young leaders.\n\nUnder our leadership, we strive to provide a nurturing environment where academic excellence meets holistic development. Every child at Saint Lawrence is encouraged to discover their strengths, embrace curiosity, and grow with integrity.\n\nWe invite you to visit our campus, meet our dedicated faculty, and experience the spirit of learning that defines our school community.",
+        image: "",
+      };
     case "chairman-message":
-      return { name: "Shri V. K. Gupta", designation: "Chairman", subtitle: "Chairman's Message", description: "Guiding future leaders towards global success.", image: "" };
+      return {
+        name: "Shri V. K. Gupta",
+        designation: "CHAIRMAN",
+        subtitle:
+          "Guiding future leaders towards global success with wisdom, purpose, and foundational human values.",
+        description:
+          "Education is not merely the transmission of knowledge; it is the ignition of intellect and character. At Saint Lawrence Public School, we nurture young minds to lead with empathy, courage, and excellence.\n\nOur commitment is to foster an environment where students explore boundless horizons and realize their highest aspirations.",
+        image: "",
+      };
+    case "principal-message":
+      return {
+        name: "Dr. R. K. Sharma",
+        designation: "PRINCIPAL",
+        subtitle:
+          "Fostering a dynamic learning ecosystem dedicated to curiosity, character, and academic distinction.",
+        description:
+          "Welcome to Saint Lawrence Public School. We provide students with comprehensive academic and extracurricular avenues to excel in life and make a meaningful impact on society.",
+        image: "",
+      };
+    case "news":
+      return {
+        subtitle:
+          "Stay up to date with events, activities, and updates from one of the best CBSE schools in Jaipur.",
+        items: [
+          {
+            title:
+              "Inter-House Sports Competitions: Celebrating Talent, Skills & Sportsmanship.",
+            date: "8th - 10th July'26",
+            category: "EDUCATION WORLD AWARD",
+            excerpt:
+              "The Inter-House Sports Competitions for Grades I to XI were successfully organised, fostering teamwork, discipline, and sporting spirit among students.",
+            image:
+              "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=1200&auto=format&fit=crop",
+            url: "/news/inter-house-sports-competitions",
+          },
+          {
+            title:
+              "Investiture Ceremony 2026–27 | Saint Lawrence Public School. Empowering Young Minds Today, Inspiring Tomorrow's Leaders.",
+            date: "18th July'26",
+            category: "LEADERSHIP & CIVICS",
+            excerpt:
+              "A momentous day as the newly elected student council takes the pledge to uphold the values, integrity, and honor of Saint Lawrence Public School.",
+            image:
+              "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1200&auto=format&fit=crop",
+            url: "/news/investiture-ceremony-2026-27",
+          },
+          {
+            title:
+              "Annual Science & Innovation Exhibition: Young Scientists Shaping the Future.",
+            date: "25th August'26",
+            category: "STEM & INNOVATION",
+            excerpt:
+              "Students showcased cutting-edge science models, robotics prototypes, and sustainable environmental solutions in our annual STEM exhibition.",
+            image:
+              "https://images.unsplash.com/photo-1581092921461-eab62e97a780?q=80&w=1200&auto=format&fit=crop",
+            url: "/news/annual-science-innovation-exhibition",
+          },
+        ],
+      };
     case "statistics":
       return { items: [{ value: "100%", label: "CBSE Pass Result" }, { value: "50+", label: "Expert Faculty" }, { value: "2000+", label: "Active Students" }, { value: "15+", label: "Sports & Labs" }] };
     case "programs":
@@ -929,11 +1656,94 @@ function getDefaultContentForType(type: string): Record<string, any> {
       return { description: "World-class facilities supporting all-round development.", items: [{ title: "Science & Computer Labs", description: "State of the art practical labs", image: "" }, { title: "Library & E-Resources", description: "Over 10,000 books and digital archives", image: "" }, { title: "Sports Complex", description: "Playgrounds for indoor and outdoor sports", image: "" }] };
     case "cta":
     case "contact-cta":
-      return { description: "Take the first step towards your child's bright future.", buttonText: "Get in Touch", buttonUrl: "/contact" };
+      return {
+        description:
+          "Saint Lawrence Public School is recognised as a leading CBSE school on Goner Road, Jaipur, Rajasthan. Today's world values citizens who are creative, empathetic, self-motivated, and critical thinkers.",
+        buttonText: "Apply Now",
+        buttonUrl: "/admissions",
+        image:
+          "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=1600&auto=format&fit=crop",
+      };
     case "video":
       return { videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" };
+    case "testimonials":
+      return {
+        subtitle: "",
+        items: [
+          {
+            name: "Dr. Anju Sharma",
+            role: "Mother of Nyra Sharma (Grade I-Tulip)",
+            quote:
+              "As a doctor and mother, I value Saint Lawrence Public School's nurturing environment. The school combines academic excellence with holistic development, fostering empathy, confidence, and curiosity.",
+            avatar:
+              "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop",
+          },
+          {
+            name: "Mr. Rajesh Mathur",
+            role: "Father of Aarav Mathur (Grade V-Lotus)",
+            quote:
+              "Choosing Saint Lawrence Public School for our son was the best decision. The faculty’s focus on conceptual learning, moral integrity, and modern sports facilities has truly transformed his confidence.",
+            avatar:
+              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+          },
+          {
+            name: "Mrs. Sunita Verma",
+            role: "Mother of Riya Verma (Grade VIII-Rose)",
+            quote:
+              "The educators go above and beyond to ensure every student’s strengths are identified and nurtured. Saint Lawrence genuinely delivers a well-rounded foundation for future leaders.",
+            avatar:
+              "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&auto=format&fit=crop",
+          },
+        ],
+      };
     case "faq":
-      return { items: [{ question: "What are the school timings?", answer: "Primary: 8:00 AM – 1:30 PM | Senior: 8:00 AM – 2:30 PM" }, { question: "Is school transport available?", answer: "Yes, GPS-tracked buses cover all major routes in the city." }] };
+      return {
+        items: [
+          {
+            question: "Which board is Saint Lawrence Public School affiliated with?",
+            answer:
+              "Saint Lawrence Public School is fully affiliated with the Central Board of Secondary Education (CBSE), New Delhi, offering an English-medium curriculum from Kindergarten to Senior Secondary.",
+          },
+          {
+            question:
+              "What is the admission process at Saint Lawrence Public School for the 2026–27 session?",
+            answer:
+              "Parents can apply online through our website or visit the school admissions desk on Goner Road, Jaipur. The process includes form submission, interaction/assessment, and document verification.",
+          },
+          {
+            question:
+              "From what grade can my child take admission at Saint Lawrence Public School?",
+            answer:
+              "Admissions are open starting from Early Years (Playgroup, Nursery, LKG, UKG) through Grade XII across Science, Commerce, and Arts streams.",
+          },
+          {
+            question: "Does Saint Lawrence offer English-medium education in Jaipur?",
+            answer:
+              "Yes, Saint Lawrence Public School is a premier English-medium CBSE institution emphasizing communicative proficiency, multilingual development, and global readiness.",
+          },
+          {
+            question: "What facilities does Saint Lawrence Public School provide?",
+            answer:
+              "Our campus includes state-of-the-art Science and Computer laboratories, a digitized Library with 10,000+ volumes, modern sports complexes (indoor and outdoor), audio-visual smart classrooms, and 24/7 CCTV security.",
+          },
+          {
+            question:
+              "Where is Saint Lawrence Public School located, and is transport available?",
+            answer:
+              "The school is conveniently located on Goner Road, Jaipur. We provide secure, GPS-enabled, and staff-monitored bus transportation covering all major neighborhoods in Jaipur.",
+          },
+          {
+            question: "What makes Saint Lawrence stand out among CBSE schools in Jaipur?",
+            answer:
+              "Our 6 dimensions of holistic student growth, value-based character building, experienced educators, small class ratios, and consistent 100% CBSE board examination results make SLPS a premier choice.",
+          },
+          {
+            question: "Where can I find the fee structure and apply online?",
+            answer:
+              "You can view our transparent fee schedule and submit online admission queries directly under our website's Admissions tab or contact our admissions office at +91-XXXXXXXXXX.",
+          },
+        ],
+      };
     default:
       return { description: "" };
   }

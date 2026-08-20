@@ -1,10 +1,14 @@
 import { homepageService } from "@/services/homepage.service";
+import { newsService } from "@/services/news.service";
 import { HomepageRenderer } from "@/features/homepage/components/homepage-renderer";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 
 export default async function RootPage() {
-  const config = await homepageService.getPublishedConfig();
+  const [config, latestNews] = await Promise.all([
+    homepageService.getPublishedConfig(),
+    newsService.findPublished(1, 10).catch(() => ({ data: [] })),
+  ]);
 
   if (!config || config.sections.length === 0) {
     return (
@@ -23,7 +27,10 @@ export default async function RootPage() {
     <div className="flex min-h-screen flex-col">
       <PublicHeader />
       <main className="flex-1">
-        <HomepageRenderer sections={JSON.parse(JSON.stringify(config.sections))} />
+        <HomepageRenderer
+          sections={JSON.parse(JSON.stringify(config.sections))}
+          latestNews={JSON.parse(JSON.stringify(latestNews.data))}
+        />
       </main>
       <PublicFooter />
     </div>

@@ -210,7 +210,11 @@ export function MenuBuilder({ initialData }: Props) {
               <div className="space-y-2"><Label>Location</Label>
                 <Select value={location} onValueChange={(v) => setLocation(v || "header")}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent><SelectItem value="header">Header</SelectItem><SelectItem value="footer">Footer</SelectItem><SelectItem value="secondary">Secondary</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="header">Header (Main Navigation)</SelectItem>
+                    <SelectItem value="footer">Footer (Column 2: Quick Links)</SelectItem>
+                    <SelectItem value="secondary">Secondary (Column 3: CBSE & Compliance)</SelectItem>
+                  </SelectContent>
                 </Select>
               </div>
               <div className="flex items-center justify-between">

@@ -63,29 +63,60 @@ export function PagesTable({ data }: PagesTableProps) {
                     {formatDate(page.createdAt, { day: "numeric", month: "short", year: "numeric" })}
                   </TableCell>
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="p-1 rounded hover:bg-muted">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => window.location.href = `/admin/pages/${page._id}`}>
-                          <Pencil className="h-4 w-4 mr-2" /> Edit
-                        </DropdownMenuItem>
-                        {page.status !== "published" && (
-                          <DropdownMenuItem onClick={() => handleAction(() => publishPage(page._id))} disabled={isPending}>
-                            <Send className="h-4 w-4 mr-2" /> Publish
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => window.location.href = `/admin/pages/${page._id}`}
+                        className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        title="Edit Page"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Are you sure you want to delete "${page.title}"?`)) {
+                            handleAction(() => deletePage(page._id));
+                          }
+                        }}
+                        disabled={isPending}
+                        className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
+                        title="Delete Page"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => window.location.href = `/admin/pages/${page._id}`}>
+                            <Pencil className="h-4 w-4 mr-2" /> Edit Page
                           </DropdownMenuItem>
-                        )}
-                        {page.status === "published" && (
-                          <DropdownMenuItem onClick={() => handleAction(() => unpublishPage(page._id))} disabled={isPending}>
-                            <Archive className="h-4 w-4 mr-2" /> Unpublish
+                          {page.status !== "published" && (
+                            <DropdownMenuItem onClick={() => handleAction(() => publishPage(page._id))} disabled={isPending}>
+                              <Send className="h-4 w-4 mr-2" /> Publish Page
+                            </DropdownMenuItem>
+                          )}
+                          {page.status === "published" && (
+                            <DropdownMenuItem onClick={() => handleAction(() => unpublishPage(page._id))} disabled={isPending}>
+                              <Archive className="h-4 w-4 mr-2" /> Unpublish Page
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to delete "${page.title}"?`)) {
+                                handleAction(() => deletePage(page._id));
+                              }
+                            }}
+                            disabled={isPending}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" /> Delete Permanently
                           </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem variant="destructive" onClick={() => handleAction(() => deletePage(page._id))} disabled={isPending}>
-                          <Trash2 className="h-4 w-4 mr-2" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

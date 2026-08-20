@@ -22,16 +22,41 @@ function isValidImageUrl(url: string | null | undefined): boolean {
 export async function PublicFooter() {
   const footerMenu = await menuService.findByLocation("footer");
   const secondaryMenu = await menuService.findByLocation("secondary");
-  const footerItems = footerMenu?.items?.filter((i) => i.isEnabled) || [];
-  const secondaryItems = secondaryMenu?.items?.filter((i) => i.isEnabled) || [];
+  const footerItems =
+    footerMenu?.items?.filter(
+      (i) =>
+        i.isEnabled &&
+        !i.label?.toLowerCase().includes("transfer certificate") &&
+        !i.label?.toLowerCase().includes("tc") &&
+        !i.url?.toLowerCase().includes("tc-tracker")
+    ) || [];
+  const secondaryItems =
+    secondaryMenu?.items?.filter(
+      (i) =>
+        i.isEnabled &&
+        !i.label?.toLowerCase().includes("transfer certificate") &&
+        !i.label?.toLowerCase().includes("tc") &&
+        !i.url?.toLowerCase().includes("tc-tracker")
+    ) || [];
   const settings = await siteSettingService.getPublicSettings();
 
   const siteName = (settings.site_name as string) || "Saint Lawrence Public School";
   const headerSubtitle = (settings.header_subtitle as string) || "CBSE Affiliated";
   const tagline = (settings.footer_text as string) || (settings.tagline as string) || "Nurturing Minds, Building Futures";
-  const address = (settings.address as string) || "";
-  const phone = (settings.phone as string) || "";
-  const email = (settings.email as string) || "";
+  const address =
+    (settings.address as string) ||
+    (settings.contact_address as string) ||
+    "Goner Road, Near Ring Road Flyover, Jaipur, Rajasthan 303905";
+  const phone =
+    (settings.phone as string) ||
+    (settings.topbar_phone as string) ||
+    (settings.contact_phone as string) ||
+    "+91 9216079411, 9216079412";
+  const email =
+    (settings.email as string) ||
+    (settings.topbar_email as string) ||
+    (settings.contact_email as string) ||
+    "stlawrencegnr@gmail.com";
   const facebook = (settings.facebook as string) || "";
   const twitter = (settings.twitter as string) || "";
   const instagram = (settings.instagram as string) || "";
@@ -189,10 +214,9 @@ export async function PublicFooter() {
                 {secondaryItems.length === 0 && (
                   <>
                     <li><Link href="/mandatory-disclosure" className="text-sm text-white/75 hover:text-white">Mandatory Public Disclosure</Link></li>
-                    <li><Link href="/results" className="text-sm text-white/75 hover:text-white">Academic Results</Link></li>
-                    <li><Link href="/tc-tracker" className="text-sm text-white/75 hover:text-white">Transfer Certificate (TC)</Link></li>
+                    <li><Link href="/admission-guidelines" className="text-sm text-white/75 hover:text-white">Admission Guidelines</Link></li>
+                    <li><Link href="/fee-structure" className="text-sm text-white/75 hover:text-white">Fee Structure</Link></li>
                     <li><Link href="/gallery" className="text-sm text-white/75 hover:text-white">Campus Gallery</Link></li>
-                    <li><Link href="/events" className="text-sm text-white/75 hover:text-white">School Events & Calendar</Link></li>
                   </>
                 )}
               </ul>

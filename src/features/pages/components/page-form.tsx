@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createPageSchema, type CreatePageInput } from "@/lib/validations/page";
 import { generateSlug } from "@/lib/cms/slug";
+import { deletePage } from "@/actions/page.actions";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,6 +35,11 @@ import {
   FileDown,
   Grid,
   Sparkles,
+  Pencil,
+  Eye,
+  Check,
+  Users,
+  Plus,
 } from "lucide-react";
 
 interface PageFormProps {
@@ -43,6 +50,7 @@ interface PageFormProps {
 
 const BLOCK_TYPES = [
   { value: "rich-text", label: "Rich Text Content", icon: FileText },
+  { value: "team-grid", label: "Management / Team Grid", icon: Users },
   { value: "image", label: "Single Image Banner", icon: ImageIcon },
   { value: "video", label: "Video Embed", icon: Video },
   { value: "button", label: "Call to Action Button", icon: Link2 },
@@ -51,9 +59,34 @@ const BLOCK_TYPES = [
 ] as const;
 
 export function PageForm({ initialData, onSubmit, isSubmitting }: PageFormProps) {
+  const router = useRouter();
+  const [isDeleting, startDeleteTransition] = useTransition();
   const [activeTab, setActiveTab] = useState<"content" | "seo" | "preview">("content");
-  const [expandedBlocks, setExpandedBlocks] = useState<Record<number, boolean>>({});
+  const [expandedBlocks, setExpandedBlocks] = useState<Record<number, boolean>>(() => {
+    const initial: Record<number, boolean> = {};
+    if (initialData?.blocks && Array.isArray(initialData.blocks)) {
+      initialData.blocks.forEach((_: any, idx: number) => {
+        initial[idx] = true;
+      });
+    }
+    return initial;
+  });
   const [previewKey, setPreviewKey] = useState(0);
+
+  const handleDelete = () => {
+    if (!initialData?._id) return;
+    if (confirm(`Are you sure you want to permanently delete "${initialData.title || 'this page'}"? This action cannot be undone.`)) {
+      startDeleteTransition(async () => {
+        const res = await deletePage(initialData._id);
+        if (res.error) {
+          toast.error(res.error);
+        } else {
+          toast.success(res.success || "Page deleted successfully");
+          router.push("/admin/pages");
+        }
+      });
+    }
+  };
 
   const handleTabChange = async (tab: "content" | "seo" | "preview") => {
     if (tab === "preview") {
@@ -241,12 +274,36 @@ export function PageForm({ initialData, onSubmit, isSubmitting }: PageFormProps)
 
             {/* Blocks List */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  Content Blocks
-                </h3>
-                <span className="text-xs text-muted-foreground">{fields.length} block(s) added</span>
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    Content Blocks
+                  </h3>
+                  <span className="text-xs bg-muted px-2 py-0.5 rounded font-mono text-muted-foreground">
+                    {fields.length} block{fields.length === 1 ? "" : "s"}
+                  </span>
+                </div>
+                {fields.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        const allExpanded = fields.every((_, i) => expandedBlocks[i]);
+                        const next: Record<number, boolean> = {};
+                        fields.forEach((_, i) => {
+                          next[i] = !allExpanded;
+                        });
+                        setExpandedBlocks(next);
+                      }}
+                    >
+                      {fields.every((_, i) => expandedBlocks[i]) ? "Collapse All" : "Expand All"}
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3">
@@ -264,51 +321,66 @@ export function PageForm({ initialData, onSubmit, isSubmitting }: PageFormProps)
                     >
                       <CardHeader className="flex flex-row items-center gap-2 py-3 px-4 select-none">
                         <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <span className="text-xs font-mono text-muted-foreground">#{idx + 1}</span>
+                        <span className="text-xs font-mono text-muted-foreground font-semibold">#{idx + 1}</span>
                         <div
                           className="flex-1 font-medium text-xs cursor-pointer truncate"
                           onClick={() => toggleExpand(idx)}
                         >
-                          {blockTypeInfo?.label || field.type}
+                          <span className="font-semibold text-foreground">{blockTypeInfo?.label || field.type}</span>
                         </div>
-                        <div className="flex items-center gap-1 shrink-0">
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {/* Explicit Edit / Toggle Button */}
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant={isExpanded ? "secondary" : "outline"}
+                            className="h-7 px-2.5 text-xs font-medium gap-1"
+                            onClick={() => toggleExpand(idx)}
+                          >
+                            <Pencil className="h-3 w-3" />
+                            <span>{isExpanded ? "Close" : "Edit"}</span>
+                          </Button>
                           <Button
                             type="button"
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8"
+                            className="h-7 w-7"
                             onClick={() => move(idx, idx - 1)}
                             disabled={idx === 0}
+                            title="Move Up"
                           >
-                            <ChevronUp className="h-4 w-4" />
+                            <ChevronUp className="h-3.5 w-3.5" />
                           </Button>
                           <Button
                             type="button"
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8"
+                            className="h-7 w-7"
                             onClick={() => move(idx, idx + 1)}
                             disabled={idx === fields.length - 1}
+                            title="Move Down"
                           >
-                            <ChevronDown className="h-4 w-4" />
+                            <ChevronDown className="h-3.5 w-3.5" />
                           </Button>
                           <Button
                             type="button"
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8"
+                            className="h-7 w-7"
                             onClick={() => duplicateBlock(idx)}
+                            title="Duplicate Block"
                           >
-                            <Copy className="h-4 w-4" />
+                            <Copy className="h-3.5 w-3.5" />
                           </Button>
                           <Button
                             type="button"
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                            className="h-7 w-7 text-destructive hover:bg-destructive/10"
                             onClick={() => remove(idx)}
+                            title="Delete Block"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </CardHeader>
@@ -483,18 +555,34 @@ export function PageForm({ initialData, onSubmit, isSubmitting }: PageFormProps)
       )}
 
       {/* Action Footer */}
-      <div className="flex justify-end gap-3 pt-6 border-t">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => window.history.back()}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : initialData ? "Save Page Changes" : "Create Page"}
-        </Button>
+      <div className="flex items-center justify-between gap-3 pt-6 border-t">
+        <div>
+          {initialData?._id && (
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isSubmitting || isDeleting}
+              className="gap-1.5"
+            >
+              <Trash2 className="h-4 w-4" />
+              {isDeleting ? "Deleting..." : "Delete Page"}
+            </Button>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => window.history.back()}
+            disabled={isSubmitting || isDeleting}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting || isDeleting}>
+            {isSubmitting ? "Saving..." : initialData ? "Save Page Changes" : "Create Page"}
+          </Button>
+        </div>
       </div>
     </form>
   );
@@ -569,6 +657,125 @@ function BlockInputs({ type, blockIdx, setValue, watch }: BlockInputsProps) {
   };
 
   switch (type) {
+    case "team-grid": {
+      const members = (Array.isArray(content.members) ? content.members : []) as {
+        name: string;
+        designation: string;
+        image?: string;
+        bio?: string;
+      }[];
+
+      const addMember = () => {
+        updateContentField("members", [
+          ...members,
+          { name: "New Leader", designation: "Trustee / Board Member", image: "", bio: "" },
+        ]);
+      };
+
+      const removeMember = (mIdx: number) => {
+        updateContentField("members", members.filter((_, i) => i !== mIdx));
+      };
+
+      const updateMemberField = (mIdx: number, field: string, value: string) => {
+        const copy = [...members];
+        if (copy[mIdx]) {
+          copy[mIdx] = { ...copy[mIdx]!, [field]: value };
+          updateContentField("members", copy);
+        }
+      };
+
+      return (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-[11px]">Grid Section Title</Label>
+              <Input
+                value={content.title ?? ""}
+                onChange={(e) => updateContentField("title", e.target.value)}
+                placeholder="e.g. Board of Management & Trustees"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">Subtitle</Label>
+              <Input
+                value={content.subtitle ?? ""}
+                onChange={(e) => updateContentField("subtitle", e.target.value)}
+                placeholder="e.g. Visionary leadership guiding SLPS"
+                className="text-xs"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold">Leadership Members ({members.length})</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addMember} className="h-7 text-xs gap-1">
+                <Plus className="h-3 w-3" /> Add Leader
+              </Button>
+            </div>
+
+            {members.map((m, mIdx) => (
+              <div key={mIdx} className="p-3.5 border rounded-xl space-y-2.5 bg-muted/20">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-semibold text-foreground">Member #{mIdx + 1}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeMember(mIdx)}
+                    className="h-6 w-6 p-0 text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Full Name</Label>
+                    <Input
+                      value={m.name}
+                      onChange={(e) => updateMemberField(mIdx, "name", e.target.value)}
+                      placeholder="e.g. Shri V. K. Gupta"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Designation / Role</Label>
+                    <Input
+                      value={m.designation}
+                      onChange={(e) => updateMemberField(mIdx, "designation", e.target.value)}
+                      placeholder="e.g. Chairman & Founder"
+                      className="text-xs h-8"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <ImageField
+                    label="Member Photo URL"
+                    value={m.image ?? ""}
+                    onChange={(url) => updateMemberField(mIdx, "image", url)}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Brief Bio / Responsibilities</Label>
+                  <Textarea
+                    value={m.bio ?? ""}
+                    onChange={(e) => updateMemberField(mIdx, "bio", e.target.value)}
+                    placeholder="Describe their contribution and educational vision..."
+                    rows={2}
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     case "rich-text":
       return (
         <div className="space-y-2">

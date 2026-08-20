@@ -184,7 +184,7 @@ export function HeroBannerSlider({ content }: HeroBannerSliderProps) {
                 priority={index === 0}
                 className="object-cover object-center"
                 sizes="100vw"
-                unoptimized={banner.image.endsWith(".svg")}
+                unoptimized
               />
             )}
             {/* Rich Navy Blue Gradient Overlay for High Text Readability */}
@@ -195,8 +195,8 @@ export function HeroBannerSlider({ content }: HeroBannerSliderProps) {
       })}
 
       {/* Main Banner Content */}
-      <Container className="relative z-10 py-20 md:py-28">
-        <div key={`slide-content-${currentIndex}`} className="max-w-3xl text-left transition-all duration-500">
+      <Container className="relative z-10 py-24 md:py-32 lg:py-36">
+        <div key={`slide-content-${currentIndex}`} className="max-w-4xl lg:max-w-5xl text-left transition-all duration-500">
           {currentBanner.badge && (
             <div className="mb-3 animate-in fade-in-50 slide-in-from-bottom-2 duration-500">
               <span className="inline-block text-[#ffb300] font-bold text-xs md:text-sm tracking-widest uppercase drop-shadow-sm">
@@ -205,12 +205,12 @@ export function HeroBannerSlider({ content }: HeroBannerSliderProps) {
             </div>
           )}
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight md:leading-[1.15] tracking-tight mb-5 drop-shadow-md animate-in fade-in-50 slide-in-from-bottom-3 duration-600">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight md:leading-[1.15] tracking-tight mb-6 drop-shadow-md animate-in fade-in-50 slide-in-from-bottom-3 duration-600">
             {currentBanner.title}
           </h1>
 
           {currentBanner.description && (
-            <p className="text-white/90 text-sm sm:text-base md:text-lg leading-relaxed mb-8 max-w-2xl drop-shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-600">
+            <p className="text-white/90 text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed mb-8 max-w-3xl drop-shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-600">
               {currentBanner.description}
             </p>
           )}

@@ -57,16 +57,16 @@ export const adminNavigation: NavGroup[] = [
       { title: "Gallery", href: "/admin/gallery", icon: Images, permission: "gallery.view" },
     ],
   },
-  {
-    title: "Academics",
-    items: [
-      { title: "Faculty", href: "/admin/faculty", icon: Users, permission: "faculty.view" },
-      { title: "Programs", href: "/admin/academics", icon: GraduationCap, permission: "academics.view" },
-      { title: "Admissions", href: "/admin/admissions", icon: ClipboardList, permission: "admissions.view" },
-      { title: "Results", href: "/admin/results", icon: BarChart3, permission: "results.view" },
-      { title: "Transfer Certs", href: "/admin/tc", icon: FileCheck, permission: "tc.view" },
-    ],
-  },
+  // {
+  //   title: "Academics",
+  //   items: [
+  //     { title: "Faculty", href: "/admin/faculty", icon: Users, permission: "faculty.view" },
+  //     { title: "Programs", href: "/admin/academics", icon: GraduationCap, permission: "academics.view" },
+  //     { title: "Admissions", href: "/admin/admissions", icon: ClipboardList, permission: "admissions.view" },
+  //     { title: "Results", href: "/admin/results", icon: BarChart3, permission: "results.view" },
+  //     { title: "Transfer Certs", href: "/admin/tc", icon: FileCheck, permission: "tc.view" },
+  //   ],
+  // },
   {
     title: "Compliance",
     items: [

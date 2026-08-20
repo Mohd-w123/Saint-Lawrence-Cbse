@@ -1,11 +1,13 @@
 import { disclosureCategoryService, disclosureSectionService } from "@/services/disclosure.service";
 import { Container } from "@/components/layout/container";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { FileText, ExternalLink } from "lucide-react";
+import { FileText, ExternalLink, Download, ShieldCheck, CheckCircle2, Building2 } from "lucide-react";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Mandatory Public Disclosure", description: "CBSE Mandatory Public Disclosure" };
+export const metadata: Metadata = {
+  title: "Mandatory Public Disclosure (CBSE Appendix-IX) | Saint Lawrence Public School",
+  description: "Official CBSE Mandatory Public Disclosure documents, certificates, and compliance details.",
+};
 
 export default async function PublicDisclosurePage() {
   const categories = await disclosureCategoryService.findPublished();
@@ -17,60 +19,126 @@ export default async function PublicDisclosurePage() {
   );
 
   return (
-    <main>
-      <div className="bg-[#003d78] text-white py-16">
-        <Container><h1 className="text-4xl font-bold">Mandatory Public Disclosure</h1><p className="mt-2 text-white/80 text-lg">As per CBSE requirements</p></Container>
+    <main className="min-h-screen bg-slate-50/60 pb-20">
+      {/* Top Banner Header */}
+      <div className="bg-[#002a54] text-white py-14 md:py-18 relative overflow-hidden border-b border-[#ffb300]/20">
+        <Container className="relative z-10">
+          <div className="flex items-center gap-2.5 text-[#ffb300] font-bold text-xs uppercase tracking-widest mb-3">
+            <ShieldCheck className="h-4 w-4" />
+            <span>CBSE Statutory Compliance (Appendix-IX)</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-3">
+            Mandatory Public Disclosure
+          </h1>
+          <p className="text-white/80 text-sm sm:text-base md:text-lg max-w-3xl leading-relaxed">
+            In compliance with the directives of the Central Board of Secondary Education (CBSE), New Delhi, all statutory documents, safety certificates, and institutional details are published below.
+          </p>
+        </Container>
       </div>
-      <Container className="py-12">
+
+      <Container className="py-10 md:py-14">
         {categoriesWithSections.length === 0 ? (
-          <p className="text-muted-foreground text-center py-12">Disclosure information coming soon.</p>
+          <div className="text-center py-16 bg-white rounded-2xl border p-8 max-w-lg mx-auto shadow-xs">
+            <Building2 className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-slate-800">Disclosure Details In Process</h3>
+            <p className="text-slate-500 text-sm mt-1">Official disclosure documents are being uploaded by the school administration.</p>
+          </div>
         ) : (
-          <div className="space-y-8 max-w-4xl mx-auto">
+          <div className="space-y-10 max-w-5xl mx-auto">
             {categoriesWithSections.map((cat) => (
-              <Card key={cat._id.toString()} className="overflow-hidden">
-                <CardHeader className="bg-[#003d78]/5 border-b"><CardTitle className="text-xl">{cat.name}</CardTitle>{cat.description && <p className="text-sm text-muted-foreground">{cat.description}</p>}</CardHeader>
-                <CardContent className="p-0">
-                  {cat.sections.length === 0 ? (
-                    <p className="p-6 text-sm text-muted-foreground">No sections available.</p>
-                  ) : (
-                    <Accordion className="divide-y">
-                      {cat.sections.map((sec) => (
-                        <AccordionItem key={sec._id.toString()} value={sec._id.toString()} className="border-0">
-                          <AccordionTrigger className="px-6 hover:no-underline hover:bg-muted/30"><span className="font-medium">{sec.title}</span></AccordionTrigger>
-                          <AccordionContent className="px-6 pb-4">
-                            {sec.fields && sec.fields.length > 0 ? (
-                              <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
-                                  <tbody className="divide-y">
-                                    {sec.fields.map((field: { label: string; type: string; value: unknown }, idx: number) => (
-                                      <tr key={idx}>
-                                        <td className="py-2 pr-4 font-medium text-muted-foreground w-1/3">{field.label}</td>
-                                        <td className="py-2">
-                                          {field.type === "url" ? (
-                                            <a href={String(field.value)} target="_blank" rel="noopener" className="text-[#0b5699] hover:underline inline-flex items-center gap-1"><ExternalLink className="h-3 w-3" /> View</a>
-                                          ) : field.type === "document" ? (
-                                            <a href={String(field.value)} target="_blank" rel="noopener" className="text-[#0b5699] hover:underline inline-flex items-center gap-1"><FileText className="h-3 w-3" /> Download</a>
-                                          ) : field.type === "boolean" ? (
-                                            <span>{field.value ? "Yes" : "No"}</span>
-                                          ) : (
-                                            <span>{String(field.value ?? "—")}</span>
-                                          )}
-                                        </td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
-                            ) : (
-                              <p className="text-sm text-muted-foreground">Details coming soon.</p>
-                            )}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  )}
-                </CardContent>
-              </Card>
+              <div key={cat._id.toString()} className="space-y-6">
+                {cat.sections.map((sec) => (
+                  <Card
+                    key={sec._id.toString()}
+                    className="overflow-hidden border border-slate-200 shadow-sm rounded-2xl bg-white"
+                  >
+                    <CardHeader className="bg-[#002a54]/5 border-b border-slate-200/80 px-6 py-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <CardTitle className="text-lg sm:text-xl font-bold text-[#002a54] flex items-center gap-2">
+                          <span>{sec.title}</span>
+                        </CardTitle>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full w-fit">
+                          {sec.fields?.length || 0} Records
+                        </span>
+                      </div>
+                      {sec.description && (
+                        <p className="text-xs sm:text-sm text-slate-600 font-normal mt-1 leading-relaxed">
+                          {sec.description}
+                        </p>
+                      )}
+                    </CardHeader>
+
+                    <CardContent className="p-0">
+                      {sec.fields && sec.fields.length > 0 ? (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-sm">
+                            <thead className="bg-slate-50/80 text-slate-700 text-xs font-semibold uppercase tracking-wider border-b border-slate-100">
+                              <tr>
+                                <th className="py-3 px-5 sm:px-6 w-12 text-center">#</th>
+                                <th className="py-3 px-4 sm:px-6">Information / Document Required</th>
+                                <th className="py-3 px-5 sm:px-6 text-right min-w-[200px]">Details / Document Link</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 font-normal text-slate-700">
+                              {sec.fields.map((field: { label: string; type: string; value: unknown }, idx: number) => {
+                                const isDoc = field.type === "document" || field.type === "url";
+                                const docUrl = String(field.value || "");
+
+                                return (
+                                  <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
+                                    <td className="py-4 px-5 sm:px-6 text-center font-mono text-xs text-slate-600">
+                                      {idx + 1}
+                                    </td>
+                                    <td className="py-4 px-4 sm:px-6 font-medium text-slate-900 leading-snug">
+                                      {field.label}
+                                    </td>
+                                    <td className="py-4 px-5 sm:px-6 text-right">
+                                      {isDoc && docUrl && docUrl !== "—" ? (
+                                        <div className="flex items-center justify-end gap-2 flex-wrap">
+                                          <a
+                                            href={docUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#002a54] text-white text-xs font-semibold hover:bg-[#003d78] shadow-xs transition-all"
+                                          >
+                                            <ExternalLink className="h-3.5 w-3.5" />
+                                            <span>View PDF</span>
+                                          </a>
+                                          <a
+                                            href={docUrl}
+                                            download
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#ffb300] text-[#002a54] text-xs font-bold hover:bg-[#ffa000] shadow-xs transition-all"
+                                          >
+                                            <Download className="h-3.5 w-3.5" />
+                                            <span>Download</span>
+                                          </a>
+                                        </div>
+                                      ) : field.type === "boolean" ? (
+                                        <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                                          <CheckCircle2 className="h-3.5 w-3.5" />
+                                          {field.value ? "Yes / Approved" : "No"}
+                                        </span>
+                                      ) : (
+                                        <span className="font-medium text-slate-800 text-xs sm:text-sm">
+                                          {String(field.value ?? "—")}
+                                        </span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <p className="p-6 text-sm text-slate-600">No records available in this section.</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             ))}
           </div>
         )}
