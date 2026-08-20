@@ -130,8 +130,8 @@ async function runUpdateFooter() {
         children: [],
       },
       {
-        label: "Transfer Certificate (TC)",
-        url: "/tc-tracker",
+        label: "Admission Guidelines",
+        url: "/admission-guidelines",
         target: "_self",
         isEnabled: true,
         order: 4,
