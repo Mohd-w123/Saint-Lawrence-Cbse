@@ -6,6 +6,8 @@ interface HomepageRendererProps {
   sections: HomepageSectionInput[];
 }
 
+import { HeroBannerSlider } from "./hero-banner-slider";
+
 export function HomepageRenderer({ sections }: HomepageRendererProps) {
   const enabledSections = sections.filter((s) => s.isEnabled).sort((a, b) => a.order - b.order);
 
@@ -24,23 +26,7 @@ function HomepageSection({ section }: { section: HomepageSectionInput }) {
 
   switch (section.type) {
     case "hero":
-      return (
-        <section className="relative min-h-[60vh] flex items-center bg-primary/5">
-          {content.backgroundImage && (
-            <img src={content.backgroundImage as string} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          )}
-          <div className="absolute inset-0 bg-black/40" />
-          <Container className="relative z-10 text-center text-white py-20">
-            {content.title && <h1 className="text-4xl md:text-6xl font-bold mb-4">{content.title as string}</h1>}
-            {content.subtitle && <p className="text-xl md:text-2xl mb-6 opacity-90">{content.subtitle as string}</p>}
-            {content.buttonText && (
-              <a href={(content.buttonUrl as string) || "#"} className="inline-block bg-accent text-accent-foreground px-8 py-3 rounded-md font-medium hover:opacity-90 transition">
-                {content.buttonText as string}
-              </a>
-            )}
-          </Container>
-        </section>
-      );
+      return <HeroBannerSlider content={content} />;
 
     case "announcement":
       return (

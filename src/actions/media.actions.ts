@@ -15,7 +15,8 @@ export async function getMedia(searchParams: Record<string, string | string[] | 
   const extraFilter: Record<string, unknown> = {};
   if (folder) extraFilter.folder = folder;
   if (mimeType) extraFilter.mimeType = { $regex: `^${mimeType}` };
-  return mediaService.findPaginated(params, extraFilter);
+  const result = await mediaService.findPaginated(params, extraFilter);
+  return JSON.parse(JSON.stringify(result));
 }
 
 export async function uploadMedia(formData: FormData): Promise<ActionState & { id?: string; url?: string }> {
@@ -76,5 +77,6 @@ export async function deleteMedia(id: string): Promise<ActionState> {
 
 export async function getMediaFolders() {
   await requirePermission("media.view");
-  return mediaService.getFolders();
+  const folders = await mediaService.getFolders();
+  return JSON.parse(JSON.stringify(folders));
 }

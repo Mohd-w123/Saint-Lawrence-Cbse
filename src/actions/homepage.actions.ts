@@ -18,6 +18,7 @@ export async function updateHomepageSections(sections: HomepageSectionInput[]): 
 
   await homepageService.updateSections(parsed.data, session.user.id);
   revalidatePath("/admin/homepage");
+  revalidatePath("/", "layout");
   revalidatePath("/");
   return { success: "Sections updated" };
 }
@@ -26,6 +27,7 @@ export async function publishHomepage(): Promise<ActionState> {
   const session = await requirePermission("homepage.publish");
   await homepageService.publish(session.user.id);
   revalidatePath("/admin/homepage");
+  revalidatePath("/", "layout");
   revalidatePath("/");
   return { success: "Homepage published" };
 }
@@ -34,6 +36,7 @@ export async function unpublishHomepage(): Promise<ActionState> {
   const session = await requirePermission("homepage.publish");
   await homepageService.unpublish(session.user.id);
   revalidatePath("/admin/homepage");
+  revalidatePath("/", "layout");
   revalidatePath("/");
   return { success: "Homepage unpublished" };
 }

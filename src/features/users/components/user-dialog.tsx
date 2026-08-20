@@ -154,7 +154,7 @@ export function UserDialog({ open, onOpenChange, user, roles }: UserDialogProps)
 
           <div className="space-y-2">
             <Label>Role</Label>
-            <Select value={roleId} onValueChange={setRoleId} required>
+            <Select value={roleId} onValueChange={(val) => setRoleId(val || "")} required>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>

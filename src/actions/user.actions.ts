@@ -14,12 +14,14 @@ export async function getUsers(searchParams: Record<string, string | string[] | 
   const roleFilter = typeof searchParams.role === "string" ? searchParams.role : undefined;
   const extraFilter: Record<string, unknown> = {};
   if (roleFilter) extraFilter.role = roleFilter;
-  return userService.findPaginated(params, extraFilter);
+  const result = await userService.findPaginated(params, extraFilter);
+  return JSON.parse(JSON.stringify(result));
 }
 
 export async function getUserById(id: string) {
   await requirePermission("users.view");
-  return userService.findById(id);
+  const result = await userService.findById(id);
+  return JSON.parse(JSON.stringify(result));
 }
 
 export async function getRoles() {

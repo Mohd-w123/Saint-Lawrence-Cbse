@@ -42,7 +42,7 @@ class SiteSettingService {
   async getPublicSettings() {
     await this.connect();
     const settings = await SiteSetting.find({
-      group: { $in: ["general", "contact", "social", "branding"] },
+      group: { $in: ["general", "contact", "social", "branding", "topbar", "header", "footer"] },
     }).lean<ISiteSetting[]>();
 
     const map: Record<string, unknown> = {};

@@ -8,12 +8,14 @@ import type { ActionState } from "@/lib/cms";
 
 export async function getAllSettings() {
   await requirePermission("settings.view");
-  return siteSettingService.getAll();
+  const settings = await siteSettingService.getAll();
+  return JSON.parse(JSON.stringify(settings));
 }
 
 export async function getSettingsByGroup(group: string) {
   await requirePermission("settings.view");
-  return siteSettingService.getByGroup(group);
+  const settings = await siteSettingService.getByGroup(group);
+  return JSON.parse(JSON.stringify(settings));
 }
 
 export async function updateSetting(data: unknown): Promise<ActionState> {

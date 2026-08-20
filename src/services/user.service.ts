@@ -28,25 +28,25 @@ class UserService extends BaseService<IUser> {
     };
 
     const sortObj: Record<string, 1 | -1> = sort
-      ? { [sort.field]: sort.order === "asc" ? 1 : -1 }
+      ? { [sort.field]: sort.order === "desc" ? -1 : 1 }
       : { createdAt: -1 };
 
-    const [data, total] = await Promise.all([
+    const [items, total] = await Promise.all([
       this.model
         .find(filter)
-        .select("-password")
-        .populate("role", "name slug")
         .sort(sortObj)
         .skip(skip)
         .limit(limit)
+        .select("-password")
+        .populate("role", "name slug")
         .lean<IUser[]>(),
       this.model.countDocuments(filter),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / limit) || 1;
 
     return {
-      data,
+      data: items,
       total,
       page,
       limit,
@@ -73,12 +73,14 @@ class UserService extends BaseService<IUser> {
     isActive?: boolean;
   }): Promise<IUser> {
     await this.connect();
+
     const hashedPassword = await bcrypt.hash(data.password, 12);
-    const doc = await this.model.create({
+    const user = await this.model.create({
       ...data,
       password: hashedPassword,
     });
-    return doc.toObject() as IUser;
+
+    return user.toObject ? user.toObject() : user;
   }
 
   async updateUser(
@@ -92,10 +94,10 @@ class UserService extends BaseService<IUser> {
     }
   ): Promise<IUser | null> {
     await this.connect();
-    const updateData: Record<string, unknown> = { ...data };
 
-    if (data.password) {
-      updateData.password = await bcrypt.hash(data.password, 12);
+    const updateData = { ...data };
+    if (updateData.password && updateData.password.trim().length > 0) {
+      updateData.password = await bcrypt.hash(updateData.password, 12);
     } else {
       delete updateData.password;
     }
