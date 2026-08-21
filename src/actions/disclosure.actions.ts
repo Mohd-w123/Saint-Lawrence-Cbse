@@ -51,6 +51,8 @@ export async function deleteDisclosureCategory(id: string): Promise<ActionState>
   const session = await requirePermission("disclosure.delete");
   await disclosureCategoryService.softDelete(id, session.user.id);
   revalidatePath("/admin/disclosure");
+  revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Deleted" };
 }
 
@@ -67,6 +69,7 @@ export async function createDisclosureSection(data: unknown): Promise<ActionStat
   await disclosureSectionService.create({ ...parsed.data, createdBy: session.user.id, updatedBy: session.user.id } as never);
   revalidatePath("/admin/disclosure");
   revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Section created" };
 }
 
@@ -78,6 +81,7 @@ export async function updateDisclosureSection(data: unknown): Promise<ActionStat
   await disclosureSectionService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/disclosure");
   revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Section updated" };
 }
 
@@ -85,6 +89,8 @@ export async function deleteDisclosureSection(id: string): Promise<ActionState> 
   await requirePermission("disclosure.delete");
   await disclosureSectionService.hardDelete(id);
   revalidatePath("/admin/disclosure");
+  revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Section deleted" };
 }
 
@@ -101,6 +107,7 @@ export async function createDisclosureTable(data: unknown): Promise<ActionState>
   await disclosureTableService.create({ ...parsed.data, createdBy: session.user.id, updatedBy: session.user.id } as never);
   revalidatePath("/admin/disclosure");
   revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Table created" };
 }
 
@@ -112,6 +119,7 @@ export async function updateDisclosureTable(data: unknown): Promise<ActionState>
   await disclosureTableService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/disclosure");
   revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Table updated" };
 }
 
@@ -119,6 +127,8 @@ export async function deleteDisclosureTable(id: string): Promise<ActionState> {
   await requirePermission("disclosure.delete");
   await disclosureTableService.delete(id);
   revalidatePath("/admin/disclosure");
+  revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Table deleted" };
 }
 
@@ -135,6 +145,7 @@ export async function createDisclosureDocument(data: unknown): Promise<ActionSta
   await disclosureDocumentService.create({ ...parsed.data, createdBy: session.user.id, updatedBy: session.user.id } as never);
   revalidatePath("/admin/disclosure");
   revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Document added" };
 }
 
@@ -142,5 +153,7 @@ export async function deleteDisclosureDocument(id: string): Promise<ActionState>
   await requirePermission("disclosure.delete");
   await disclosureDocumentService.delete(id);
   revalidatePath("/admin/disclosure");
+  revalidatePath("/mandatory-disclosure");
+  revalidatePath("/", "layout");
   return { success: "Document removed" };
 }

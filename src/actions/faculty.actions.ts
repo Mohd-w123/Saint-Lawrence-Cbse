@@ -62,5 +62,6 @@ export async function bulkDeleteFaculty(ids: string[]): Promise<ActionState> {
   const session = await requirePermission("faculty.delete");
   await facultyService.bulkDelete(ids, session.user.id);
   revalidatePath("/admin/faculty");
+  revalidatePath("/faculty");
   return { success: `${ids.length} faculty deleted` };
 }

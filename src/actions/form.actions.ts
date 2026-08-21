@@ -29,6 +29,10 @@ export async function createForm(data: unknown): Promise<ActionState & { id?: st
   } as never);
 
   revalidatePath("/admin/forms");
+  revalidatePath("/", "layout");
+  if (doc?.slug) {
+    revalidatePath(`/forms/${doc.slug}`);
+  }
   return { success: "Form created successfully", id: doc._id.toString() };
 }
 
@@ -37,22 +41,35 @@ export async function updateForm(data: unknown): Promise<ActionState> {
   const parsed = updateFormSchema.safeParse(data);
   if (!parsed.success) return { error: parsed.error.errors[0]?.message ?? "Invalid form structure" };
   const { id, ...updateData } = parsed.data;
-  await formService.update(id, { ...updateData, updatedBy: session.user.id } as never);
+  const doc = await formService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/forms");
+  revalidatePath("/", "layout");
+  if (doc?.slug) {
+    revalidatePath(`/forms/${doc.slug}`);
+  }
   return { success: "Form updated successfully" };
 }
 
 export async function publishForm(id: string): Promise<ActionState> {
   const session = await requirePermission("forms.update");
-  await formService.publish(id, session.user.id);
+  const doc = await formService.publish(id, session.user.id);
   revalidatePath("/admin/forms");
+  revalidatePath("/", "layout");
+  if (doc?.slug) {
+    revalidatePath(`/forms/${doc.slug}`);
+  }
   return { success: "Form published" };
 }
 
 export async function deleteForm(id: string): Promise<ActionState> {
   const session = await requirePermission("forms.delete");
+  const existing = await formService.findById(id);
   await formService.softDelete(id, session.user.id);
   revalidatePath("/admin/forms");
+  revalidatePath("/", "layout");
+  if (existing?.slug) {
+    revalidatePath(`/forms/${existing.slug}`);
+  }
   return { success: "Form deleted" };
 }
 

@@ -4,6 +4,9 @@ import { HomepageRenderer } from "@/features/homepage/components/homepage-render
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function RootPage() {
   const [config, latestNews] = await Promise.all([
     homepageService.getPublishedConfig(),

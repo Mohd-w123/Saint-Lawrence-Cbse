@@ -22,6 +22,7 @@ export async function createTC(data: unknown): Promise<ActionState & { id?: stri
   if (!parsed.success) return { error: parsed.error.errors[0]?.message ?? "Invalid data" };
   const doc = await tcService.create({ ...parsed.data, createdBy: session.user.id, updatedBy: session.user.id } as never);
   revalidatePath("/admin/tc");
+  revalidatePath("/tc-tracker");
   return { success: "Transfer certificate issued", id: doc._id.toString() };
 }
 
@@ -32,6 +33,7 @@ export async function updateTC(data: unknown): Promise<ActionState> {
   const { id, ...updateData } = parsed.data;
   await tcService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/tc");
+  revalidatePath("/tc-tracker");
   return { success: "Transfer certificate updated" };
 }
 
@@ -39,6 +41,7 @@ export async function deleteTC(id: string): Promise<ActionState> {
   const session = await requirePermission("tc.delete");
   await tcService.softDelete(id, session.user.id);
   revalidatePath("/admin/tc");
+  revalidatePath("/tc-tracker");
   return { success: "Transfer certificate deleted" };
 }
 
