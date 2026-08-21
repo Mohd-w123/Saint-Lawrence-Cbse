@@ -36,6 +36,8 @@ export async function createNews(data: unknown): Promise<ActionState & { id?: st
 
   revalidatePath("/admin/news");
   revalidatePath("/news");
+  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { success: "News created", id: news._id.toString() };
 }
 
@@ -45,33 +47,54 @@ export async function updateNews(data: unknown): Promise<ActionState> {
   if (!parsed.success) return { error: parsed.error.errors[0]?.message ?? "Invalid data" };
 
   const { id, ...updateData } = parsed.data;
-  await newsService.update(id, { ...updateData, updatedBy: session.user.id } as never);
+  const news = await newsService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/news");
   revalidatePath("/news");
+  revalidatePath("/");
+  revalidatePath("/", "layout");
+  if (news?.slug) {
+    revalidatePath(`/news/${news.slug}`);
+  }
   return { success: "News updated" };
 }
 
 export async function publishNews(id: string): Promise<ActionState> {
   const session = await requirePermission("news.publish");
-  await newsService.publish(id, session.user.id);
+  const news = await newsService.publish(id, session.user.id);
   revalidatePath("/admin/news");
   revalidatePath("/news");
+  revalidatePath("/");
+  revalidatePath("/", "layout");
+  if (news?.slug) {
+    revalidatePath(`/news/${news.slug}`);
+  }
   return { success: "News published" };
 }
 
 export async function unpublishNews(id: string): Promise<ActionState> {
   const session = await requirePermission("news.publish");
-  await newsService.unpublish(id, session.user.id);
+  const news = await newsService.unpublish(id, session.user.id);
   revalidatePath("/admin/news");
   revalidatePath("/news");
+  revalidatePath("/");
+  revalidatePath("/", "layout");
+  if (news?.slug) {
+    revalidatePath(`/news/${news.slug}`);
+  }
   return { success: "News unpublished" };
 }
 
 export async function deleteNews(id: string): Promise<ActionState> {
   const session = await requirePermission("news.delete");
+  const existing = await newsService.findById(id);
   await newsService.softDelete(id, session.user.id);
   revalidatePath("/admin/news");
   revalidatePath("/news");
+  revalidatePath("/");
+  revalidatePath("/", "layout");
+  if (existing?.slug) {
+    revalidatePath(`/news/${existing.slug}`);
+  }
   return { success: "News deleted" };
 }
 
@@ -79,5 +102,8 @@ export async function bulkDeleteNews(ids: string[]): Promise<ActionState> {
   const session = await requirePermission("news.delete");
   await newsService.bulkDelete(ids, session.user.id);
   revalidatePath("/admin/news");
+  revalidatePath("/news");
+  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { success: `${ids.length} article(s) deleted` };
 }

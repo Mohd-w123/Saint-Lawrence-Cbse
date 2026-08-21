@@ -53,5 +53,7 @@ export async function deleteResult(id: string): Promise<ActionState> {
   const session = await requirePermission("results.delete");
   await resultService.softDelete(id, session.user.id);
   revalidatePath("/admin/results");
+  revalidatePath("/results");
+  revalidatePath("/", "layout");
   return { success: "Deleted" };
 }

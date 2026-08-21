@@ -50,5 +50,7 @@ export async function deleteAdmission(id: string): Promise<ActionState> {
   const session = await requirePermission("admissions.delete");
   await admissionService.softDelete(id, session.user.id);
   revalidatePath("/admin/admissions");
+  revalidatePath("/admissions");
+  revalidatePath("/", "layout");
   return { success: "Deleted" };
 }

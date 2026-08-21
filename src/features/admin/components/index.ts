@@ -17,3 +17,4 @@ export { PaginationControls } from "./pagination-controls";
 export { BulkActionsBar } from "./bulk-actions-bar";
 export { FormDrawer } from "./form-drawer";
 export { FormModal } from "./form-modal";
+export { ClearCacheButton } from "./clear-cache-button";

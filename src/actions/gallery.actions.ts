@@ -134,5 +134,7 @@ export async function reorderGalleryItems(
   await requirePermission("gallery.update");
   await galleryService.reorderItems(items);
   revalidatePath("/admin/gallery");
+  revalidatePath("/gallery");
+  revalidatePath("/", "layout");
   return { success: "Items reordered" };
 }

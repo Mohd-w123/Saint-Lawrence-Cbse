@@ -43,6 +43,8 @@ export async function deleteProgram(id: string): Promise<ActionState> {
   const session = await requirePermission("academics.delete");
   await programService.softDelete(id, session.user.id);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Program deleted" };
 }
 
@@ -59,6 +61,8 @@ export async function createClass(data: unknown): Promise<ActionState> {
   const slug = await classService.generateUniqueSlug(parsed.data.name);
   await classService.create({ ...parsed.data, slug: parsed.data.slug || slug, createdBy: session.user.id, updatedBy: session.user.id } as never);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Class created" };
 }
 
@@ -69,6 +73,8 @@ export async function updateClass(data: unknown): Promise<ActionState> {
   const { id, ...updateData } = parsed.data;
   await classService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Class updated" };
 }
 
@@ -76,6 +82,8 @@ export async function deleteClass(id: string): Promise<ActionState> {
   const session = await requirePermission("academics.delete");
   await classService.softDelete(id, session.user.id);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Class deleted" };
 }
 
@@ -92,6 +100,8 @@ export async function createSubject(data: unknown): Promise<ActionState> {
   const slug = await subjectService.generateUniqueSlug(parsed.data.name);
   await subjectService.create({ ...parsed.data, slug: parsed.data.slug || slug, createdBy: session.user.id, updatedBy: session.user.id } as never);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Subject created" };
 }
 
@@ -102,6 +112,8 @@ export async function updateSubject(data: unknown): Promise<ActionState> {
   const { id, ...updateData } = parsed.data;
   await subjectService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Subject updated" };
 }
 
@@ -109,6 +121,8 @@ export async function deleteSubject(id: string): Promise<ActionState> {
   const session = await requirePermission("academics.delete");
   await subjectService.softDelete(id, session.user.id);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Subject deleted" };
 }
 
@@ -128,6 +142,7 @@ export async function createCalendarEvent(data: unknown): Promise<ActionState> {
   await calendarService.create({ ...parsed.data, createdBy: session.user.id, updatedBy: session.user.id } as never);
   revalidatePath("/admin/academics");
   revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Calendar event created" };
 }
 
@@ -138,6 +153,8 @@ export async function updateCalendarEvent(data: unknown): Promise<ActionState> {
   const { id, ...updateData } = parsed.data;
   await calendarService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Calendar event updated" };
 }
 
@@ -145,5 +162,7 @@ export async function deleteCalendarEvent(id: string): Promise<ActionState> {
   const session = await requirePermission("academics.delete");
   await calendarService.hardDelete(id);
   revalidatePath("/admin/academics");
+  revalidatePath("/academics");
+  revalidatePath("/", "layout");
   return { success: "Calendar event deleted" };
 }

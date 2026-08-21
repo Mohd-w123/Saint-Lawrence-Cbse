@@ -51,5 +51,6 @@ export async function createSetting(data: { key: string; value: unknown; group: 
     type: data.type as "text",
   });
   revalidatePath("/admin/settings");
+  revalidatePath("/", "layout");
   return { success: "Setting created" };
 }

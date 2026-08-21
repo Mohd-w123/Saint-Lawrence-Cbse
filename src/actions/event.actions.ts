@@ -75,5 +75,7 @@ export async function bulkDeleteEvents(ids: string[]): Promise<ActionState> {
   const session = await requirePermission("events.delete");
   await eventService.bulkDelete(ids, session.user.id);
   revalidatePath("/admin/events");
+  revalidatePath("/events");
+  revalidatePath("/", "layout");
   return { success: `${ids.length} event(s) deleted` };
 }

@@ -40,30 +40,46 @@ export async function updatePage(data: unknown): Promise<ActionState> {
   if (!parsed.success) return { error: parsed.error.errors[0]?.message ?? "Invalid data" };
 
   const { id, ...updateData } = parsed.data;
-  await pageService.update(id, { ...updateData, updatedBy: session.user.id } as never);
+  const page = await pageService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/pages");
-  revalidatePath(`/${(updateData as { slug?: string }).slug ?? ""}`);
+  revalidatePath("/", "layout");
+  if (page?.slug) {
+    revalidatePath(`/${page.slug}`);
+  }
   return { success: "Page updated" };
 }
 
 export async function publishPage(id: string): Promise<ActionState> {
   const session = await requirePermission("pages.publish");
-  await pageService.publish(id, session.user.id);
+  const page = await pageService.publish(id, session.user.id);
   revalidatePath("/admin/pages");
+  revalidatePath("/", "layout");
+  if (page?.slug) {
+    revalidatePath(`/${page.slug}`);
+  }
   return { success: "Page published" };
 }
 
 export async function unpublishPage(id: string): Promise<ActionState> {
   const session = await requirePermission("pages.publish");
-  await pageService.unpublish(id, session.user.id);
+  const page = await pageService.unpublish(id, session.user.id);
   revalidatePath("/admin/pages");
+  revalidatePath("/", "layout");
+  if (page?.slug) {
+    revalidatePath(`/${page.slug}`);
+  }
   return { success: "Page unpublished" };
 }
 
 export async function deletePage(id: string): Promise<ActionState> {
   const session = await requirePermission("pages.delete");
+  const existing = await pageService.findById(id);
   await pageService.softDelete(id, session.user.id);
   revalidatePath("/admin/pages");
+  revalidatePath("/", "layout");
+  if (existing?.slug) {
+    revalidatePath(`/${existing.slug}`);
+  }
   return { success: "Page deleted" };
 }
 
@@ -71,5 +87,6 @@ export async function bulkDeletePages(ids: string[]): Promise<ActionState> {
   const session = await requirePermission("pages.delete");
   await pageService.bulkDelete(ids, session.user.id);
   revalidatePath("/admin/pages");
+  revalidatePath("/", "layout");
   return { success: `${ids.length} page(s) deleted` };
 }

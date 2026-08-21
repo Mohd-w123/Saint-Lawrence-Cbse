@@ -32,6 +32,8 @@ export async function createMenu(data: unknown): Promise<ActionState & { id?: st
   } as never);
 
   revalidatePath("/admin/menus");
+  revalidatePath("/", "layout");
+  revalidatePath("/");
   return { success: "Menu created", id: menu._id.toString() };
 }
 
@@ -43,6 +45,7 @@ export async function updateMenu(data: unknown): Promise<ActionState> {
   const { id, ...updateData } = parsed.data;
   await menuService.update(id, { ...updateData, updatedBy: session.user.id } as never);
   revalidatePath("/admin/menus");
+  revalidatePath("/", "layout");
   revalidatePath("/");
   return { success: "Menu updated" };
 }
@@ -51,6 +54,7 @@ export async function deleteMenu(id: string): Promise<ActionState> {
   await requirePermission("menus.delete");
   await menuService.delete(id);
   revalidatePath("/admin/menus");
+  revalidatePath("/", "layout");
   revalidatePath("/");
   return { success: "Menu deleted" };
 }
