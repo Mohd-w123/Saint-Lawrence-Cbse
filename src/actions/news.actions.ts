@@ -47,7 +47,16 @@ export async function updateNews(data: unknown): Promise<ActionState> {
   if (!parsed.success) return { error: parsed.error.errors[0]?.message ?? "Invalid data" };
 
   const { id, ...updateData } = parsed.data;
-  const news = await newsService.update(id, { ...updateData, updatedBy: session.user.id } as never);
+  const payload: Record<string, unknown> = { ...updateData, updatedBy: session.user.id };
+  if (updateData.status === "published") {
+    const existing = await newsService.findById(id);
+    if (!existing?.publishedAt) {
+      payload.publishedAt = new Date();
+    }
+  } else if (updateData.status === "draft" || updateData.status === "archived") {
+    payload.publishedAt = null;
+  }
+  const news = await newsService.update(id, payload as never);
   revalidatePath("/admin/news");
   revalidatePath("/news");
   revalidatePath("/");

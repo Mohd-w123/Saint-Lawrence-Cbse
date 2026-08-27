@@ -5,6 +5,9 @@ import { RichTextRenderer } from "@/components/shared/rich-text-renderer";
 import type { Metadata } from "next";
 import { FileDown } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function getEmbedUrl(url: string) {
   if (!url) return "";
   let videoId = "";

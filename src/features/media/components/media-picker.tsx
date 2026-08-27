@@ -108,7 +108,7 @@ export function MediaPicker({ open, onOpenChange, onSelect, mimeFilter = "image"
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col p-6">
+      <DialogContent className="max-w-2xl sm:max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col p-6">
         <DialogHeader className="pb-2">
           <DialogTitle className="text-lg font-bold">Select or Upload Media</DialogTitle>
         </DialogHeader>
