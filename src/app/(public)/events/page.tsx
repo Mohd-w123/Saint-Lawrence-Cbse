@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Calendar, MapPin, Clock, ArrowRight, ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = { title: "Events", description: "Upcoming school events and activities" };
 
 export default async function PublicEventsPage() {

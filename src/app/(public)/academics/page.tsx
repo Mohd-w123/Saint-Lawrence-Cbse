@@ -4,6 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap } from "lucide-react";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = { title: "Academics", description: "Academic programs and curriculum" };
 
 export default async function PublicAcademicsPage() {

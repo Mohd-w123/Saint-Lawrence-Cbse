@@ -5,6 +5,9 @@ import Link from "next/link";
 import { User, Mail } from "lucide-react";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Faculty",
   description: "Meet our dedicated teaching staff",

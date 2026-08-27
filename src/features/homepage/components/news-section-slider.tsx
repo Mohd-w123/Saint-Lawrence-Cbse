@@ -68,10 +68,10 @@ export function NewsSectionSlider({
   const contentItems = Array.isArray(content.items) ? (content.items as NewsItem[]) : [];
 
   const rawList: NewsItem[] =
-    contentItems.length > 0
-      ? contentItems
-      : latestNews.length > 0
-        ? latestNews
+    latestNews.length > 0
+      ? latestNews
+      : contentItems.length > 0
+        ? contentItems
         : DEFAULT_SAMPLE_NEWS;
 
   const newsList: NewsItem[] = rawList.map((item, idx) => {

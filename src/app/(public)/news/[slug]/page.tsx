@@ -4,6 +4,9 @@ import { Container } from "@/components/layout/container";
 import { RichTextRenderer } from "@/components/shared/rich-text-renderer";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface Props {
   params: Promise<{ slug: string }>;
 }

@@ -5,6 +5,9 @@ import { Phone, Mail, MapPin, Clock, Globe, Send } from "lucide-react";
 import type { Metadata } from "next";
 import { ContactFormClient } from "@/features/contact/components/contact-form-client";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Contact Us",
   description: "Get in touch with our school. Find our address, phone numbers, email, and office hours.",

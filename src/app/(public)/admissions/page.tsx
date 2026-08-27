@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextRenderer } from "@/components/shared/rich-text-renderer";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = { title: "Admissions", description: "Admission information and process" };
 
 export default async function PublicAdmissionsPage() {

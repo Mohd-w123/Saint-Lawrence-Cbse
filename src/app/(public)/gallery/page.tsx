@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Images, Video } from "lucide-react";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Gallery",
   description: "Photo and video gallery",

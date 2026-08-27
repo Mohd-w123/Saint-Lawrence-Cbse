@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, ExternalLink, Download, ShieldCheck, CheckCircle2, Building2 } from "lucide-react";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Mandatory Public Disclosure (CBSE Appendix-IX) | Saint Lawrence Public School",
   description: "Official CBSE Mandatory Public Disclosure documents, certificates, and compliance details.",
