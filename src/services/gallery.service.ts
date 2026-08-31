@@ -33,7 +33,6 @@ class GalleryAlbumService extends BaseService<IGalleryAlbum> {
       await this.connect();
       const existing = await this.model.findOne({
         slug: candidate,
-        isDeleted: { $ne: true },
         ...(excludeId ? { _id: { $ne: excludeId } } : {}),
       });
       return !!existing;

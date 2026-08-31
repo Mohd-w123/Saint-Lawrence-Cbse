@@ -92,35 +92,40 @@ export async function bulkDeletePages(ids: string[]): Promise<ActionState> {
 }
 
 export async function duplicatePage(id: string): Promise<ActionState & { id?: string }> {
-  const session = await requirePermission("pages.create");
-  const existing = await pageService.findById(id);
-  if (!existing) return { error: "Page not found" };
+  try {
+    const session = await requirePermission("pages.create");
+    const existing = await pageService.findById(id);
+    if (!existing) return { error: "Page not found" };
 
-  const newTitle = `${existing.title} (Copy)`;
-  const slug = await pageService.generateUniqueSlug(newTitle);
+    const newTitle = `${existing.title} (Copy)`;
+    const slug = await pageService.generateUniqueSlug(newTitle);
 
-  const blocks = (existing.blocks || []).map((b, idx) => ({
-    type: b.type,
-    content: JSON.parse(JSON.stringify(b.content || {})),
-    order: idx,
-  }));
+    const blocks = (existing.blocks || []).map((b, idx) => ({
+      type: b.type,
+      content: JSON.parse(JSON.stringify(b.content || {})),
+      order: idx,
+    }));
 
-  const page = await pageService.create({
-    title: newTitle,
-    slug,
-    description: existing.description,
-    banner: existing.banner,
-    blocks,
-    status: "draft",
-    template: existing.template,
-    seoTitle: existing.seoTitle ? `${existing.seoTitle} (Copy)` : undefined,
-    seoDescription: existing.seoDescription,
-    seoKeywords: existing.seoKeywords ? [...existing.seoKeywords] : [],
-    createdBy: session.user.id,
-    updatedBy: session.user.id,
-  } as never);
+    const page = await pageService.create({
+      title: newTitle,
+      slug,
+      description: existing.description,
+      banner: existing.banner,
+      blocks,
+      status: "draft",
+      template: existing.template,
+      seoTitle: existing.seoTitle ? `${existing.seoTitle} (Copy)` : undefined,
+      seoDescription: existing.seoDescription,
+      seoKeywords: existing.seoKeywords ? [...existing.seoKeywords] : [],
+      createdBy: session.user.id,
+      updatedBy: session.user.id,
+    } as never);
 
-  revalidatePath("/admin/pages");
-  return { success: `Page duplicated as "${newTitle}"`, id: page._id.toString() };
+    revalidatePath("/admin/pages");
+    return { success: `Page duplicated as "${newTitle}"`, id: page._id.toString() };
+  } catch (err: any) {
+    console.error("Duplicate page error:", err);
+    return { error: err?.message || "Failed to duplicate page" };
+  }
 }
 
