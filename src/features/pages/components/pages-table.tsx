@@ -8,8 +8,8 @@ import { PaginationControls } from "@/features/admin/components/pagination-contr
 import { DataTableContainer } from "@/features/admin/components/data-table-container";
 import { EmptyState } from "@/components/shared/empty-state";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Send, Archive, Trash2 } from "lucide-react";
-import { publishPage, unpublishPage, deletePage } from "@/actions/page.actions";
+import { MoreHorizontal, Pencil, Send, Archive, Trash2, Copy } from "lucide-react";
+import { publishPage, unpublishPage, deletePage, duplicatePage } from "@/actions/page.actions";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils/format";
 import type { PaginatedResult } from "@/lib/cms";
@@ -74,6 +74,15 @@ export function PagesTable({ data }: PagesTableProps) {
                       </button>
                       <button
                         type="button"
+                        onClick={() => handleAction(() => duplicatePage(page._id))}
+                        disabled={isPending}
+                        className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                        title="Duplicate Page"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => {
                           if (confirm(`Are you sure you want to delete "${page.title}"?`)) {
                             handleAction(() => deletePage(page._id));
@@ -92,6 +101,9 @@ export function PagesTable({ data }: PagesTableProps) {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => window.location.href = `/admin/pages/${page._id}`}>
                             <Pencil className="h-4 w-4 mr-2" /> Edit Page
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleAction(() => duplicatePage(page._id))} disabled={isPending}>
+                            <Copy className="h-4 w-4 mr-2" /> Duplicate Page
                           </DropdownMenuItem>
                           {page.status !== "published" && (
                             <DropdownMenuItem onClick={() => handleAction(() => publishPage(page._id))} disabled={isPending}>
