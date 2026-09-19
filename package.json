@@ -5,12 +5,16 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "postbuild": "cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/static",
+    "start": "node --max-old-space-size=512 .next/standalone/server.js",
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
     "typecheck": "tsc --noEmit",
     "seed": "npx tsx scripts/seed.ts"
+  },
+  "engines": {
+    "node": "20.x"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

@@ -1,10 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   experimental: {
     serverActions: {
       bodySizeLimit: "25mb",
     },
+    workerThreads: false,
+    cpus: 1,
   },
   images: {
     remotePatterns: [
