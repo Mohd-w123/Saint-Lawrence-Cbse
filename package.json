@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/static",
+    "postbuild": "node -e \"const fs=require('fs'); if(fs.existsSync('public') && fs.existsSync('.next/standalone')) fs.cpSync('public', '.next/standalone/public', {recursive:true}); if(fs.existsSync('.next/static') && fs.existsSync('.next/standalone/.next')) fs.cpSync('.next/static', '.next/standalone/.next/static', {recursive:true});\"",
     "start": "node --max-old-space-size=512 .next/standalone/server.js",
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
@@ -14,7 +14,7 @@
     "seed": "npx tsx scripts/seed.ts"
   },
   "engines": {
-    "node": "20.x"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
