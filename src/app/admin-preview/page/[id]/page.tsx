@@ -2,6 +2,7 @@ import { requirePermission } from "@/lib/auth/session";
 import { getPageById } from "@/actions/page.actions";
 import { Container } from "@/components/layout/container";
 import { RichTextRenderer } from "@/components/shared/rich-text-renderer";
+import { getDownloadUrl } from "@/lib/utils/format";
 import { FileDown } from "lucide-react";
 import { notFound } from "next/navigation";
 
@@ -91,7 +92,7 @@ export default async function AdminPagePreviewPage({ params }: Props) {
             {block.type === "attachment" && typeof block.content.url === "string" && (
               <div className="my-6">
                 <a
-                  href={block.content.url}
+                  href={getDownloadUrl(block.content.url, (block.content.label as string) || "Document")}
                   download
                   target="_blank"
                   rel="noopener noreferrer"

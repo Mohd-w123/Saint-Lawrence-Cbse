@@ -21,19 +21,37 @@ export interface UploadResult {
 
 export async function uploadToCloudinary(
   file: Buffer,
-  options: { folder?: string; resourceType?: "image" | "raw" | "video" } = {}
+  options: { folder?: string; resourceType?: "image" | "raw" | "video"; filename?: string } = {}
 ): Promise<UploadResult> {
-  const { folder = "school-cms", resourceType = "image" } = options;
+  const { folder = "school-cms", resourceType = "image", filename } = options;
 
   if (!process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME === "your-cloud-name") {
-    return saveLocally(file, resourceType);
+    return saveLocally(file, resourceType, filename);
   }
 
   try {
+    const ext = filename ? path.extname(filename) : "";
+    const baseName = filename
+      ? path.basename(filename, ext).replace(/[^a-zA-Z0-9_-]/g, "_").substring(0, 60)
+      : `file_${Date.now()}`;
+    const timestamp = Date.now();
+
+    // For raw files (PDFs, docs), Cloudinary requires the extension in public_id
+    // to serve the download with the correct extension in the URL
+    const publicId = resourceType === "raw" && ext
+      ? `${baseName}_${timestamp}${ext.toLowerCase()}`
+      : `${baseName}_${timestamp}`;
+
     return await new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
-          { folder, resource_type: resourceType },
+          {
+            folder,
+            resource_type: resourceType,
+            public_id: publicId,
+            use_filename: true,
+            unique_filename: true,
+          },
           (error, result) => {
             if (error || !result) return reject(error ?? new Error("Upload failed"));
             resolve({
@@ -42,7 +60,7 @@ export async function uploadToCloudinary(
               secureUrl: result.secure_url,
               width: result.width,
               height: result.height,
-              format: result.format,
+              format: result.format || (ext ? ext.replace(".", "") : ""),
               size: result.bytes,
               resourceType: result.resource_type,
             });
@@ -52,11 +70,11 @@ export async function uploadToCloudinary(
     });
   } catch (err) {
     console.warn("Cloudinary upload failed, falling back to local storage:", err);
-    return saveLocally(file, resourceType);
+    return saveLocally(file, resourceType, filename);
   }
 }
 
-async function saveLocally(file: Buffer, resourceType: string): Promise<UploadResult> {
+async function saveLocally(file: Buffer, resourceType: string, filename?: string): Promise<UploadResult> {
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
@@ -64,15 +82,24 @@ async function saveLocally(file: Buffer, resourceType: string): Promise<UploadRe
 
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(2, 8);
-  const ext = resourceType === "video" ? "mp4" : "png";
-  const filename = `${timestamp}_${randomStr}.${ext}`;
-  const filePath = path.join(uploadsDir, filename);
+  const ext = filename
+    ? path.extname(filename).replace(/^\./, "").toLowerCase()
+    : resourceType === "video"
+    ? "mp4"
+    : resourceType === "raw"
+    ? "pdf"
+    : "png";
+  const baseName = filename
+    ? path.basename(filename, path.extname(filename)).replace(/[^a-zA-Z0-9_-]/g, "_").substring(0, 60)
+    : `file_${timestamp}`;
+  const savedFilename = `${baseName}_${timestamp}_${randomStr}.${ext}`;
+  const filePath = path.join(uploadsDir, savedFilename);
 
   await fs.promises.writeFile(filePath, file);
 
-  const localUrl = `/uploads/${filename}`;
+  const localUrl = `/uploads/${savedFilename}`;
   return {
-    publicId: `local_${timestamp}_${randomStr}`,
+    publicId: `local_${savedFilename}`,
     url: localUrl,
     secureUrl: localUrl,
     width: 800,
