@@ -3,6 +3,7 @@ import { pageService } from "@/services/page.service";
 import { Container } from "@/components/layout/container";
 import { RichTextRenderer } from "@/components/shared/rich-text-renderer";
 import type { Metadata } from "next";
+import { getDownloadUrl } from "@/lib/utils/format";
 import { FileDown } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -135,7 +136,7 @@ export default async function DynamicPage({ params }: Props) {
             {block.type === "attachment" && typeof block.content.url === "string" && (
               <div className="my-6">
                 <a
-                  href={block.content.url}
+                  href={getDownloadUrl(block.content.url, (block.content.label as string) || "Document")}
                   download
                   target="_blank"
                   rel="noopener noreferrer"

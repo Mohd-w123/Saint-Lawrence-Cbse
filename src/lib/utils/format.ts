@@ -20,3 +20,28 @@ export function formatRelativeDate(date: Date | string): string {
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
   return formatDate(d);
 }
+
+export function isDocumentUrl(url: string | undefined | null): boolean {
+  if (!url || typeof url !== "string") return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("/raw/upload/") ||
+    lower.endsWith(".pdf") ||
+    lower.endsWith(".doc") ||
+    lower.endsWith(".docx") ||
+    lower.endsWith(".xls") ||
+    lower.endsWith(".xlsx") ||
+    lower.endsWith(".csv") ||
+    lower.endsWith(".txt")
+  );
+}
+
+export function getDownloadUrl(url: string | undefined | null, filenameLabel?: string): string {
+  if (!url || typeof url !== "string") return "";
+  const trimmed = url.trim();
+  if (!trimmed) return "";
+
+  const name = filenameLabel || "document";
+  return `/api/download?url=${encodeURIComponent(trimmed)}&name=${encodeURIComponent(name)}`;
+}
+

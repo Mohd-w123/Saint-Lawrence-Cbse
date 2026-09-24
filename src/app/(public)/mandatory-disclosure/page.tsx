@@ -1,6 +1,7 @@
 import { disclosureCategoryService, disclosureSectionService } from "@/services/disclosure.service";
 import { Container } from "@/components/layout/container";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getDownloadUrl } from "@/lib/utils/format";
 import { FileText, ExternalLink, Download, ShieldCheck, CheckCircle2, Building2 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -108,7 +109,7 @@ export default async function PublicDisclosurePage() {
                                             <span>View PDF</span>
                                           </a>
                                           <a
-                                            href={docUrl}
+                                            href={getDownloadUrl(docUrl, field.label)}
                                             download
                                             target="_blank"
                                             rel="noopener noreferrer"

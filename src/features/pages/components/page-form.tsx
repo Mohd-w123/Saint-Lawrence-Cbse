@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MediaPicker } from "@/features/media/components/media-picker";
+import { isDocumentUrl } from "@/lib/utils/format";
 import {
   Trash2,
   Copy,
@@ -40,6 +41,7 @@ import {
   Check,
   Users,
   Plus,
+  ExternalLink,
 } from "lucide-react";
 
 interface PageFormProps {
@@ -604,16 +606,44 @@ function ImageField({
       <Label className="text-xs">{label}</Label>
       <div className="flex flex-col gap-2">
         {value && (
-          <div className="relative aspect-[3/1] w-full rounded border overflow-hidden bg-muted group">
-            <img src={value} alt="" className="w-full h-full object-cover" />
-            <button
-              type="button"
-              onClick={() => onChange("")}
-              className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <Trash2 className="h-4 w-4 text-white" />
-            </button>
-          </div>
+          isDocumentUrl(value) ? (
+            <div className="flex items-center justify-between p-3 rounded border bg-muted/40 text-xs">
+              <div className="flex items-center gap-2 overflow-hidden mr-2">
+                <FileText className="h-5 w-5 text-primary shrink-0" />
+                <span className="truncate font-medium text-foreground">{value}</span>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <a
+                  href={value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  title="Open file in new tab"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+                <button
+                  type="button"
+                  onClick={() => onChange("")}
+                  className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                  title="Remove file"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="relative aspect-[3/1] w-full rounded border overflow-hidden bg-muted group">
+              <img src={value} alt="" className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Trash2 className="h-4 w-4 text-white" />
+              </button>
+            </div>
+          )
         )}
         <div className="flex gap-2">
           <Input
